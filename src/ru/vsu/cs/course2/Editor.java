@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.function.Function;
 
@@ -21,6 +22,8 @@ public class Editor implements Icon {
     private Plane plane;
     private Point selected;
     private Function<Graphics2D, LineDrawer> getDrawer;
+    //cache
+    private BufferedImage imageCache;
 
     Editor(Plane plane, JLabel label, JComponent parent, Function<Graphics2D, LineDrawer> getDrawer) {
         this.plane = plane;
@@ -75,12 +78,17 @@ public class Editor implements Icon {
         } else if (selected != null && e.getButton() == MouseEvent.BUTTON3) {
             plane.points.remove(selected);
             selected = null;
+            imageCache = null;
+        } else {
+            imageCache = null;
         }
         repaint();
     }
 
     private void onMouseReleased() {
         selected = null;
+        imageCache = null;
+        revalidateCache();
     }
 
     private void onMouseDragged(MouseEvent e) {
@@ -94,10 +102,11 @@ public class Editor implements Icon {
 
     @Override
     public void paintIcon(Component c, Graphics gg, int x, int y) {
+        if(!isCacheValid()) {
+            revalidateCache();
+        }
         Graphics2D g = (Graphics2D) gg;
-        g.setRenderingHints(rh);
-
-        g.setColor(Color.WHITE);
+        g.setColor(Color.white);
         g.fillRect(0, 0, getIconWidth(), getIconHeight());
 
         for (int i = 0; i < plane.points.size(); i++) {
@@ -108,21 +117,52 @@ public class Editor implements Icon {
             g.drawString(String.valueOf(i), point.x + dx, point.y + dy);
         }
 
+        gg.drawImage(imageCache, 0, 0, null);
+
+        LineDrawer lineDrawer = getDrawer.apply(g);
+        int size = plane.points.size();
+        for (int i = 1; i < size - 1; i++) {
+            Point p1 = plane.points.get(i);
+            Point p2 = plane.points.get((i + 1) % size);
+            //g.setColor(Color.RED);
+            //g.drawLine(p1.x, p1.y, p2.x, p2.y);
+            if (p1.equals(selected) || p2.equals(selected))
+                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y, Color.red);
+        }
+
+        //g.setFont(fontLabel);
+        //g.setColor(Color.BLUE);
+        //int width = g.getFontMetrics().stringWidth(perimeter);
+        //g.drawString(perimeter, getIconWidth() - width - 10, getIconHeight() - 10);
+    }
+
+    private void revalidateCache() {
+        imageCache = new BufferedImage(getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = imageCache.createGraphics();
+        g.setRenderingHints(rh);
+
+        g.setColor(new Color(255, 255, 255, 0));
+        g.fillRect(0, 0, getIconWidth(), getIconHeight());
+
         LineDrawer lineDrawer = getDrawer.apply(g);
 
+        //Draw all except selected
         int size = plane.points.size();
         for (int i = 0; i < size - 1; i++) {
             Point p1 = plane.points.get(i);
             Point p2 = plane.points.get((i + 1) % size);
             //g.setColor(Color.RED);
             //g.drawLine(p1.x, p1.y, p2.x, p2.y);
-            lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y, Color.red);
+            if (!p1.equals(selected) && !p2.equals(selected))
+                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y, Color.red);
         }
+        g.dispose();
+    }
 
-        g.setFont(fontLabel);
-        g.setColor(Color.BLUE);
-        //int width = g.getFontMetrics().stringWidth(perimeter);
-        //g.drawString(perimeter, getIconWidth() - width - 10, getIconHeight() - 10);
+    private boolean isCacheValid() {
+        return imageCache != null &&
+                imageCache.getWidth() == getIconWidth() &&
+                imageCache.getHeight() == getIconHeight();
     }
 
     @Override

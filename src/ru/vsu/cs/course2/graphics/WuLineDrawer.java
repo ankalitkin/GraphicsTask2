@@ -4,13 +4,17 @@ import java.awt.*;
 
 public class WuLineDrawer implements LineDrawer {
     private PixelDrawer pixelDrawer;
-
+    private static Color cachedColor;
+    private static Color[] alphaColor;
+    
     public WuLineDrawer(PixelDrawer pixelDrawer) {
         this.pixelDrawer = pixelDrawer;
     }
 
     @Override
     public void drawLine(int x1, int y1, int x2, int y2, Color c) {
+        cacheColors(c);
+
         int x, y, dx, dy;
         boolean swap = false;
 
@@ -43,7 +47,7 @@ public class WuLineDrawer implements LineDrawer {
 
         int err = 0;
         for (int i = 0; i <= dx; i++) {
-            drawWuPixel(x, y, err, dx, c, swap);
+            drawWuPixel(x, y, err, dx, swap);
             err += 2 * dy;
             if (err > dx) {
                 err -= 2 * dx;
@@ -56,15 +60,31 @@ public class WuLineDrawer implements LineDrawer {
         }
     }
 
-    private void drawWuPixel(int x, int y, int err, int dx, Color c, boolean swap) {
+    private void drawWuPixel(int x, int y, int err, int dx, boolean swap) {
+        int d = (255 * err) / (2 * dx);
+        int dPos = Math.max(0, d);
+        int dNeg = Math.max(0, -d);
         if (!swap) {
-            pixelDrawer.drawPixel(x, y - 1, new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(0, (255 * err) / (-2 * dx))));
-            pixelDrawer.drawPixel(x, y, new Color(c.getRed(), c.getGreen(), c.getBlue(), 255 - Math.max(0, (255 * err) / (-2 * dx))));
-            pixelDrawer.drawPixel(x, y + 1, new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(0, (255 * err) / (2 * dx))));
+            pixelDrawer.drawPixel(x, y - 1, alphaColor[dNeg]);
+            pixelDrawer.drawPixel(x, y, alphaColor[255 - dNeg]);
+            pixelDrawer.drawPixel(x, y + 1, alphaColor[dPos]);
         } else {
-            pixelDrawer.drawPixel(y - 1, x, new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(0, (255 * err) / (-2 * dx))));
-            pixelDrawer.drawPixel(y, x, new Color(c.getRed(), c.getGreen(), c.getBlue(), 255 - Math.max(0, (255 * err) / (-2 * dx))));
-            pixelDrawer.drawPixel(y + 1, x, new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.max(0, (255 * err) / (2 * dx))));
+            pixelDrawer.drawPixel(y - 1, x, alphaColor[dNeg]);
+            pixelDrawer.drawPixel(y, x, alphaColor[255 - dNeg]);
+            pixelDrawer.drawPixel(y + 1, x, alphaColor[dPos]);
         }
+    }
+    
+    private void cacheColors(Color color) {
+        if (color.equals(cachedColor))
+            return;
+        cachedColor = color;
+        int r = color.getRed();
+        int g = color.getGreen();
+        int b = color.getBlue();
+        float alpha = color.getRGBComponents(null)[3];
+        alphaColor = new Color[256];
+        for(int i = 0; i < 256; i++)
+            alphaColor[i] = new Color(r, g, b, (int)(i * alpha));
     }
 }
