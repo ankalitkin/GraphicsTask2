@@ -12,7 +12,7 @@ import java.util.function.Function;
 import ru.vsu.cs.course2.Plane.Point;
 import ru.vsu.cs.course2.graphics.LineDrawer;
 
-public class Editor implements Icon {
+public class Editor extends JPanel {
     private static HashMap<RenderingHints.Key, Object> rh;
     private final Font numbersFont = new Font("Segoe UI", Font.PLAIN, 16);
     private final Font fontLabel = new Font("Segoe UI", Font.BOLD, 32);
@@ -25,14 +25,12 @@ public class Editor implements Icon {
     //cache
     private BufferedImage imageCache;
 
-    Editor(Plane plane, JLabel label, JComponent parent, Function<Graphics2D, LineDrawer> getDrawer) {
+    Editor(Plane plane, Function<Graphics2D, LineDrawer> getDrawer) {
         this.plane = plane;
-        this.parent = parent;
-        this.label = label;
         this.getDrawer = getDrawer;
         rh = new HashMap<>();
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        label.addMouseListener(new MouseListener() {
+        addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
             }
@@ -55,7 +53,7 @@ public class Editor implements Icon {
             public void mouseExited(MouseEvent e) {
             }
         });
-        label.addMouseMotionListener(new MouseMotionListener() {
+        addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 onMouseDragged(e);
@@ -67,19 +65,27 @@ public class Editor implements Icon {
         });
     }
 
-    private void repaint() {
+    /*private void repaint() {
         label.paintImmediately(0, 0, getIconWidth(), getIconHeight());
-    }
+    }*/
 
     private void onMousePressed(MouseEvent e) {
         selected = plane.getClosest(e.getX(), e.getY(), dx, dy);
-        if (selected == null && e.getButton() == MouseEvent.BUTTON1) {
-            selected = plane.addNewPoint(e.getX(), e.getY());
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            if (selected == null) {
+                selected = plane.addNewPoint(e.getX(), e.getY());
+            } else if (e.isControlDown()) {
+                selected = plane.insertBefore(e.getX(), e.getY(), selected);
+                imageCache = null;
+            } else if (e.isShiftDown()) {
+                selected = plane.insertAfter(e.getX(), e.getY(), selected);
+                imageCache = null;
+            } else {
+                imageCache = null;
+            }
         } else if (selected != null && e.getButton() == MouseEvent.BUTTON3) {
             plane.points.remove(selected);
             selected = null;
-            imageCache = null;
-        } else {
             imageCache = null;
         }
         repaint();
@@ -101,13 +107,14 @@ public class Editor implements Icon {
     }
 
     @Override
-    public void paintIcon(Component c, Graphics gg, int x, int y) {
+    public void paintComponent(Graphics gg) {
         if(!isCacheValid()) {
             revalidateCache();
         }
         Graphics2D g = (Graphics2D) gg;
+        g.setRenderingHints(rh);
         g.setColor(Color.white);
-        g.fillRect(0, 0, getIconWidth(), getIconHeight());
+        g.fillRect(0, 0, getWidth(), getHeight());
 
         for (int i = 0; i < plane.points.size(); i++) {
             Point point = plane.points.get(i);
@@ -121,7 +128,7 @@ public class Editor implements Icon {
 
         LineDrawer lineDrawer = getDrawer.apply(g);
         int size = plane.points.size();
-        for (int i = 1; i < size - 1; i++) {
+        for (int i = 0; i < size - 1; i++) {
             Point p1 = plane.points.get(i);
             Point p2 = plane.points.get((i + 1) % size);
             //g.setColor(Color.RED);
@@ -137,12 +144,11 @@ public class Editor implements Icon {
     }
 
     private void revalidateCache() {
-        imageCache = new BufferedImage(getIconWidth(), getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        imageCache = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = imageCache.createGraphics();
-        g.setRenderingHints(rh);
 
         g.setColor(new Color(255, 255, 255, 0));
-        g.fillRect(0, 0, getIconWidth(), getIconHeight());
+        g.fillRect(0, 0, getWidth(), getHeight());
 
         LineDrawer lineDrawer = getDrawer.apply(g);
 
@@ -161,17 +167,12 @@ public class Editor implements Icon {
 
     private boolean isCacheValid() {
         return imageCache != null &&
-                imageCache.getWidth() == getIconWidth() &&
-                imageCache.getHeight() == getIconHeight();
+                imageCache.getWidth() == getWidth() &&
+                imageCache.getHeight() == getHeight();
     }
 
-    @Override
-    public int getIconWidth() {
-        return parent.getWidth();
+    public void invalidateCache() {
+        imageCache = null;
     }
 
-    @Override
-    public int getIconHeight() {
-        return parent.getHeight();
-    }
 }

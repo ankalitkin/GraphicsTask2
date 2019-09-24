@@ -38,4 +38,16 @@ class Plane {
         return p;
     }
 
+    Point insertBefore(int x, int y, Point point) {
+        Point p = new Point(x, y, nextZ());
+        points.add(points.indexOf(point), p);
+        return p;
+    }
+
+    Point insertAfter(int x, int y, Point point) {
+        Point p = new Point(x, y, nextZ());
+        points.add(points.indexOf(point) + 1, p);
+        return p;
+    }
+
 }

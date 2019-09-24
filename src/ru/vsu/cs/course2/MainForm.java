@@ -13,6 +13,7 @@ public class MainForm {
     private JRadioButton wuRadioButton;
     private JCheckBox subpixelCheckBox;
     private JCheckBox upscaleX3CheckBox;
+    private static Editor editor;
 
     public static void main(String[] args) {
         try {
@@ -32,26 +33,31 @@ public class MainForm {
         bg.add(wuRadioButton);
         DDARadioButton.setSelected(true);
 
-        JLabel label = new JLabel();
+
         Plane plane = new Plane();
-        label.setIcon(new Editor(plane, label, drawPanel, graphics -> {
+        editor = new Editor(plane, graphics -> {
             PixelDrawer pixelDrawer = new NativePixelDrawer(graphics);
 
             LineDrawer lineDrawer;
-            if(DDARadioButton.isSelected())
+            if (DDARadioButton.isSelected())
                 lineDrawer = new DDALineDrawer(pixelDrawer);
-            else if(bresenhamRadioButton.isSelected())
+            else if (bresenhamRadioButton.isSelected())
                 lineDrawer = new BresenhamLineDrawer(pixelDrawer);
             else
                 lineDrawer = new WuLineDrawer(pixelDrawer);
 
             return lineDrawer;
-        }));
+        });
         drawPanel.setLayout(new GridLayout());
-        drawPanel.add(label);
+        drawPanel.add(editor);
 
-        DDARadioButton.addActionListener((e) -> drawPanel.repaint());
-        bresenhamRadioButton.addActionListener((e) -> drawPanel.repaint());
-        wuRadioButton.addActionListener((e) -> drawPanel.repaint());
+        DDARadioButton.addActionListener((e) -> repaint());
+        bresenhamRadioButton.addActionListener((e) -> repaint());
+        wuRadioButton.addActionListener((e) -> repaint());
+    }
+
+    private void repaint() {
+        editor.invalidateCache();
+        drawPanel.repaint();
     }
 }

@@ -61,20 +61,28 @@ public class WuLineDrawer implements LineDrawer {
     }
 
     private void drawWuPixel(int x, int y, int err, int dx, boolean swap) {
-        int d = (255 * err) / (2 * dx);
+        int d = dx != 0 ? (255 * err) / (2 * dx) : 255;
         int dPos = Math.max(0, d);
         int dNeg = Math.max(0, -d);
         if (!swap) {
-            pixelDrawer.drawPixel(x, y - 1, alphaColor[dNeg]);
             pixelDrawer.drawPixel(x, y, alphaColor[255 - dNeg]);
-            pixelDrawer.drawPixel(x, y + 1, alphaColor[dPos]);
+            if (dx != 0) {
+                if (dPos > 0)
+                    pixelDrawer.drawPixel(x, y + 1, alphaColor[dPos]);
+                else
+                    pixelDrawer.drawPixel(x, y - 1, alphaColor[dNeg]);
+            }
         } else {
-            pixelDrawer.drawPixel(y - 1, x, alphaColor[dNeg]);
             pixelDrawer.drawPixel(y, x, alphaColor[255 - dNeg]);
-            pixelDrawer.drawPixel(y + 1, x, alphaColor[dPos]);
+            if (dx != 0) {
+                if (dPos > 0)
+                    pixelDrawer.drawPixel(y + 1, x, alphaColor[dPos]);
+                else
+                    pixelDrawer.drawPixel(y - 1, x, alphaColor[dNeg]);
+            }
         }
     }
-    
+
     private void cacheColors(Color color) {
         if (color.equals(cachedColor))
             return;
