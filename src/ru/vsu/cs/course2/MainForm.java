@@ -11,8 +11,7 @@ public class MainForm {
     private JRadioButton DDARadioButton;
     private JRadioButton bresenhamRadioButton;
     private JRadioButton wuRadioButton;
-    private JCheckBox subpixelCheckBox;
-    private JCheckBox upscaleX3CheckBox;
+    private JCheckBox ellipseCheckBox;
     private static Editor editor;
 
     public static void main(String[] args) {
@@ -39,12 +38,15 @@ public class MainForm {
             PixelDrawer pixelDrawer = new NativePixelDrawer(graphics);
 
             LineDrawer lineDrawer;
-            if (DDARadioButton.isSelected())
-                lineDrawer = new DDALineDrawer(pixelDrawer);
-            else if (bresenhamRadioButton.isSelected())
-                lineDrawer = new BresenhamLineDrawer(pixelDrawer);
-            else
-                lineDrawer = new WuLineDrawer(pixelDrawer);
+            if (!ellipseCheckBox.isSelected()) {
+                if (DDARadioButton.isSelected())
+                    lineDrawer = new DDALineDrawer(pixelDrawer);
+                else if (bresenhamRadioButton.isSelected())
+                    lineDrawer = new BresenhamLineDrawer(pixelDrawer);
+                else
+                    lineDrawer = new WuLineDrawer(pixelDrawer);
+            } else
+                lineDrawer = new DDAEllipseDrawer(pixelDrawer);
 
             return lineDrawer;
         });
@@ -54,6 +56,7 @@ public class MainForm {
         DDARadioButton.addActionListener((e) -> repaint());
         bresenhamRadioButton.addActionListener((e) -> repaint());
         wuRadioButton.addActionListener((e) -> repaint());
+        ellipseCheckBox.addActionListener((e) -> repaint());
     }
 
     private void repaint() {
