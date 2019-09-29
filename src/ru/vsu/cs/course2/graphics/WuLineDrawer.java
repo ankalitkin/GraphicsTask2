@@ -64,8 +64,9 @@ public class WuLineDrawer implements LineDrawer {
         int d = dx != 0 ? (255 * err) / (2 * dx) : 255;
         int dPos = Math.max(0, d);
         int dNeg = Math.max(0, -d);
+        int dMax = 255 - Math.abs(d);
         if (!swap) {
-            pixelDrawer.drawPixel(x, y, alphaColor[255 - dNeg]);
+            pixelDrawer.drawPixel(x, y, alphaColor[dMax]);
             if (dx != 0) {
                 if (dPos > 0)
                     pixelDrawer.drawPixel(x, y + 1, alphaColor[dPos]);
@@ -73,7 +74,7 @@ public class WuLineDrawer implements LineDrawer {
                     pixelDrawer.drawPixel(x, y - 1, alphaColor[dNeg]);
             }
         } else {
-            pixelDrawer.drawPixel(y, x, alphaColor[255 - dNeg]);
+            pixelDrawer.drawPixel(y, x, alphaColor[dMax]);
             if (dx != 0) {
                 if (dPos > 0)
                     pixelDrawer.drawPixel(y + 1, x, alphaColor[dPos]);
