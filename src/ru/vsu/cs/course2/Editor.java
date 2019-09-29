@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.function.Function;
 
 import ru.vsu.cs.course2.Plane.Point;
+import ru.vsu.cs.course2.graphics.GraphicsProvider;
 import ru.vsu.cs.course2.graphics.LineDrawer;
 
 public class Editor extends JPanel {
@@ -21,13 +22,13 @@ public class Editor extends JPanel {
     private JLabel label;
     private Plane plane;
     private Point selected;
-    private Function<Graphics2D, LineDrawer> getDrawer;
+    private GraphicsProvider graphicsProvider;
     //cache
     private BufferedImage imageCache;
 
-    Editor(Plane plane, Function<Graphics2D, LineDrawer> getDrawer) {
+    Editor(Plane plane, GraphicsProvider graphicsProvider) {
         this.plane = plane;
-        this.getDrawer = getDrawer;
+        this.graphicsProvider = graphicsProvider;
         rh = new HashMap<>();
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         addMouseListener(new MouseListener() {
@@ -126,7 +127,7 @@ public class Editor extends JPanel {
 
         gg.drawImage(imageCache, 0, 0, null);
 
-        LineDrawer lineDrawer = getDrawer.apply(g);
+        LineDrawer lineDrawer = graphicsProvider.getLineDrawer();
         int size = plane.points.size();
         for (int i = 0; i < size - 1; i++) {
             Point p1 = plane.points.get(i);
@@ -134,7 +135,7 @@ public class Editor extends JPanel {
             //g.setColor(Color.RED);
             //g.drawLine(p1.x, p1.y, p2.x, p2.y);
             if (p1.equals(selected) || p2.equals(selected))
-                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y, Color.red);
+                lineDrawer.drawLine(g, p1.x, p1.y, p2.x, p2.y);
         }
 
         //g.setFont(fontLabel);
@@ -150,7 +151,7 @@ public class Editor extends JPanel {
         g.setColor(new Color(255, 255, 255, 0));
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        LineDrawer lineDrawer = getDrawer.apply(g);
+        LineDrawer lineDrawer = graphicsProvider.getLineDrawer();
 
         //Draw all except selected
         int size = plane.points.size();
@@ -160,7 +161,7 @@ public class Editor extends JPanel {
             //g.setColor(Color.RED);
             //g.drawLine(p1.x, p1.y, p2.x, p2.y);
             if (!p1.equals(selected) && !p2.equals(selected))
-                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y, Color.red);
+                lineDrawer.drawLine(g, p1.x, p1.y, p2.x, p2.y);
         }
         g.dispose();
     }

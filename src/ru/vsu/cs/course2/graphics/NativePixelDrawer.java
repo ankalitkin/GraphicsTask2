@@ -3,15 +3,21 @@ package ru.vsu.cs.course2.graphics;
 import java.awt.*;
 
 public class NativePixelDrawer implements PixelDrawer {
-    private Graphics2D graphics;
+    private GraphicsProvider graphicsProvider;
 
-    public NativePixelDrawer(Graphics2D graphics) {
-        this.graphics = graphics;
+    public NativePixelDrawer(GraphicsProvider graphicsProvider) {
+        this.graphicsProvider = graphicsProvider;
     }
 
     @Override
-    public void drawPixel(int x, int y, Color c) {
-        graphics.setColor(c);
+    public void drawPixel(Graphics2D graphics, int x, int y) {
+        graphics.setColor(graphicsProvider.getColor());
+        graphics.drawLine(x, y, x, y);
+    }
+
+    @Override
+    public void drawPixel(Graphics2D graphics, int x, int y, int alpha) {
+        graphics.setColor(graphicsProvider.getAlphaColor(alpha));
         graphics.drawLine(x, y, x, y);
     }
 }

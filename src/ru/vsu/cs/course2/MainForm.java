@@ -13,6 +13,7 @@ public class MainForm {
     private JRadioButton wuRadioButton;
     private JCheckBox ellipseCheckBox;
     private static Editor editor;
+    private final GraphicsProvider graphicsProvider;
 
     public static void main(String[] args) {
         try {
@@ -26,37 +27,39 @@ public class MainForm {
     }
 
     private MainForm() {
+        graphicsProvider = new GraphicsProvider();
+        graphicsProvider.setColor(Color.red);
+        graphicsProvider.setPixelDrawer(new NativePixelDrawer(graphicsProvider));
+        DDARadioButton.putClientProperty(LineDrawer.class, new DDALineDrawer(graphicsProvider));
+        bresenhamRadioButton.putClientProperty(LineDrawer.class, new BresenhamLineDrawer(graphicsProvider));
+        wuRadioButton.putClientProperty(LineDrawer.class, new WuLineDrawer(graphicsProvider));
+
         ButtonGroup bg = new ButtonGroup();
         bg.add(DDARadioButton);
         bg.add(bresenhamRadioButton);
         bg.add(wuRadioButton);
         DDARadioButton.setSelected(true);
 
-
         Plane plane = new Plane();
-        editor = new Editor(plane, graphics -> {
-            PixelDrawer pixelDrawer = new NativePixelDrawer(graphics);
-
-            LineDrawer lineDrawer;
-            if (!ellipseCheckBox.isSelected()) {
-                if (DDARadioButton.isSelected())
-                    lineDrawer = new DDALineDrawer(pixelDrawer);
-                else if (bresenhamRadioButton.isSelected())
-                    lineDrawer = new BresenhamLineDrawer(pixelDrawer);
-                else
-                    lineDrawer = new WuLineDrawer(pixelDrawer);
-            } else
-                lineDrawer = new DDAEllipseDrawer(pixelDrawer);
-
-            return lineDrawer;
-        });
+        editor = new Editor(plane, graphicsProvider);
         drawPanel.setLayout(new GridLayout());
         drawPanel.add(editor);
 
-        DDARadioButton.addActionListener((e) -> repaint());
-        bresenhamRadioButton.addActionListener((e) -> repaint());
-        wuRadioButton.addActionListener((e) -> repaint());
-        ellipseCheckBox.addActionListener((e) -> repaint());
+        DDARadioButton.addActionListener((e) -> reInit());
+        bresenhamRadioButton.addActionListener((e) -> reInit());
+        wuRadioButton.addActionListener((e) -> reInit());
+        ellipseCheckBox.addActionListener((e) -> reInit());
+        reInit();
+    }
+
+    private void reInit() {
+        if (DDARadioButton.isSelected())
+            graphicsProvider.setLineDrawer((LineDrawer) DDARadioButton.getClientProperty(LineDrawer.class));
+        else if (bresenhamRadioButton.isSelected())
+            graphicsProvider.setLineDrawer((LineDrawer) bresenhamRadioButton.getClientProperty(LineDrawer.class));
+        else
+            graphicsProvider.setLineDrawer((LineDrawer) wuRadioButton.getClientProperty(LineDrawer.class));
+        repaint();
     }
 
     private void repaint() {
