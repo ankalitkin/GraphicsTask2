@@ -10,6 +10,11 @@ public class DDAEllipseDrawer implements EllipseDrawer {
     }
 
     @Override
+    public void drawEllipse(Graphics2D graphics, int x1, int y1, int x2, int y2) {
+        drawEllipse(graphics, x1, y1, x2, y2, 0, 2 * Math.PI);
+    }
+
+    @Override
     public void drawEllipse(Graphics2D graphics, int x1, int y1, int x2, int y2, double startAngle, double endAngle) {
         if (x1 > x2) {
             int tmp = x1;
@@ -25,8 +30,8 @@ public class DDAEllipseDrawer implements EllipseDrawer {
         int a = (x2 - x1) / 2;
         int b = (y2 - y1) / 2;
 
-        int count = (int) ((x2 - x1 + y2 - y1) * Math.abs(startAngle - endAngle) / Math.PI);
-        double dt = (startAngle - endAngle) / count;
+        int count = (int) ((Math.abs(x2 - x1) + Math.abs(y2 - y1)) * Math.abs(startAngle - endAngle) / Math.PI);
+        double dt = (endAngle - startAngle) / count;
 
         double t = startAngle;
         PixelDrawer pixelDrawer = graphicsProvider.getPixelDrawer();
@@ -36,10 +41,5 @@ public class DDAEllipseDrawer implements EllipseDrawer {
             pixelDrawer.drawPixel(graphics, x1 + x + a, y1 + y + b);
             t += dt;
         }
-
-    }
-
-    public void drawEllipse(Graphics2D graphics, int x1, int y1, int x2, int y2) {
-        drawEllipse(graphics, x1, y1, x2, y2, 0, 2 * Math.PI);
     }
 }

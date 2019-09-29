@@ -7,8 +7,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import java.util.function.Function;
-
 import ru.vsu.cs.course2.Plane.Point;
 import ru.vsu.cs.course2.graphics.GraphicsProvider;
 import ru.vsu.cs.course2.graphics.LineDrawer;
