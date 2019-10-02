@@ -22,7 +22,7 @@ public class PieDrawingWrapper implements PieDrawer {
         int ys = (int) (b * Math.sin(startAngle));
         int xe = (int) (a * Math.cos(endAngle));
         int ye = (int) (b * Math.sin(endAngle));
-        ellipseDrawer.drawEllipse(graphics, x1, y1, x2, y2, startAngle, endAngle);
+        ellipseDrawer.drawArc(graphics, x1, y1, x2, y2, startAngle, endAngle);
 
         double val = Math.abs((startAngle - endAngle) % (Math.PI * 2));
         if (val >= EPS && val <= Math.PI * 2 - EPS) {

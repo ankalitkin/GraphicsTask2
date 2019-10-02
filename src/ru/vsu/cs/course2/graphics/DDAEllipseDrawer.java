@@ -11,11 +11,11 @@ public class DDAEllipseDrawer implements EllipseDrawer {
 
     @Override
     public void drawEllipse(Graphics2D graphics, int x1, int y1, int x2, int y2) {
-        drawEllipse(graphics, x1, y1, x2, y2, 0, 2 * Math.PI);
+        drawArc(graphics, x1, y1, x2, y2, 0, 2 * Math.PI);
     }
 
     @Override
-    public void drawEllipse(Graphics2D graphics, int x1, int y1, int x2, int y2, double startAngle, double endAngle) {
+    public void drawArc(Graphics2D graphics, int x1, int y1, int x2, int y2, double startAngle, double endAngle) {
         if (x1 > x2) {
             int tmp = x1;
             x1 = x2;

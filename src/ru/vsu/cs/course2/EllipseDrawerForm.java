@@ -5,7 +5,7 @@ import ru.vsu.cs.course2.graphics.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class EllipseDrawer {
+public class EllipseDrawerForm {
     private JPanel rootPanel;
     private JPanel drawPanel;
     private JSlider startAngleSlider;
@@ -24,24 +24,24 @@ public class EllipseDrawer {
         } catch (Exception ignored) {
         }
         JFrame frame = new JFrame("Pie & ellipse drawer by @kalitkin_a_v");
-        frame.setContentPane(new EllipseDrawer().rootPanel);
+        frame.setContentPane(new EllipseDrawerForm().rootPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setVisible(true);
     }
 
-    private EllipseDrawer() {
+    private EllipseDrawerForm() {
         graphicsProvider = new GraphicsProvider();
         graphicsProvider.setColor(Color.red);
         graphicsProvider.setPixelDrawer(new NativePixelDrawer(graphicsProvider));
 
-        graphicsProvider.setEllipseDrawer(new DDAEllipseDrawer(graphicsProvider));
-        //Todo: add Bresenhaim and Wu ellipse drawers
-
         graphicsProvider.setPieDrawer(new PieDrawingWrapper(graphicsProvider));
         DDARadioButton.putClientProperty(LineDrawer.class, new DDALineDrawer(graphicsProvider));
+        DDARadioButton.putClientProperty(EllipseDrawer.class, new DDAEllipseDrawer(graphicsProvider));
         bresenhamRadioButton.putClientProperty(LineDrawer.class, new BresenhamLineDrawer(graphicsProvider));
+        bresenhamRadioButton.putClientProperty(EllipseDrawer.class, new BresenhamEllipseDrawer(graphicsProvider));
         wuRadioButton.putClientProperty(LineDrawer.class, new WuLineDrawer(graphicsProvider));
+        wuRadioButton.putClientProperty(EllipseDrawer.class, new BresenhamEllipseDrawer(graphicsProvider));
 
         ButtonGroup bg = new ButtonGroup();
         bg.add(DDARadioButton);
@@ -78,12 +78,16 @@ public class EllipseDrawer {
     }
 
     private void reInit() {
-        if (DDARadioButton.isSelected())
+        if (DDARadioButton.isSelected()) {
             graphicsProvider.setLineDrawer((LineDrawer) DDARadioButton.getClientProperty(LineDrawer.class));
-        else if (bresenhamRadioButton.isSelected())
+            graphicsProvider.setEllipseDrawer((EllipseDrawer) DDARadioButton.getClientProperty(EllipseDrawer.class));
+        } else if (bresenhamRadioButton.isSelected()) {
             graphicsProvider.setLineDrawer((LineDrawer) bresenhamRadioButton.getClientProperty(LineDrawer.class));
-        else
+            graphicsProvider.setEllipseDrawer((EllipseDrawer) bresenhamRadioButton.getClientProperty(EllipseDrawer.class));
+        } else {
             graphicsProvider.setLineDrawer((LineDrawer) wuRadioButton.getClientProperty(LineDrawer.class));
+            graphicsProvider.setEllipseDrawer((EllipseDrawer) wuRadioButton.getClientProperty(EllipseDrawer.class));
+        }
         repaint();
     }
 
