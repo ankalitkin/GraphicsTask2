@@ -1,8 +1,10 @@
 package ru.vsu.cs.course2.graphics;
 
 class Ellipse {
-    private int x1, y1, x2, y2, xc, yc, a, b;
-    private double minAngle, maxAngle, sinMinAngle, sinMaxAngle, cosMinAngle, cosMaxAngle;
+    private int x1, y1, x2, y2, xc, yc, a, b, ACosMinAngle, ACosMaxAngle, BSinMinAngle, BSinMaxAngle;
+    private double minAngle, maxAngle, deltaAngle,
+            sinMinAngle, sinMaxAngle, cosMinAngle, cosMaxAngle;
+    private int[] processed;
 
     Ellipse(int x1, int y1, int x2, int y2, double startAngle, double endAngle) {
         if (x1 > x2) {
@@ -25,10 +27,16 @@ class Ellipse {
         yc = (y1 + y2) / 2;
         minAngle = Math.min(startAngle, endAngle);
         maxAngle = Math.max(startAngle, endAngle);
+        deltaAngle = maxAngle - minAngle;
         sinMinAngle = Math.sin(minAngle);
         sinMaxAngle = Math.sin(maxAngle);
         cosMinAngle = Math.cos(minAngle);
         cosMaxAngle = Math.cos(maxAngle);
+        ACosMaxAngle = (int) (a * cosMaxAngle);
+        ACosMinAngle = (int) (a * cosMinAngle);
+        BSinMaxAngle = (int) (b * sinMaxAngle);
+        BSinMinAngle = (int) (b * sinMinAngle);
+        processed = BresenhamEllipseUtils.processEllipse(this);
     }
 
     int getX1() {
@@ -85,5 +93,29 @@ class Ellipse {
 
     double getCosMaxAngle() {
         return cosMaxAngle;
+    }
+
+    double getDeltaAngle() {
+        return deltaAngle;
+    }
+
+    int getACosMinAngle() {
+        return ACosMinAngle;
+    }
+
+    int getACosMaxAngle() {
+        return ACosMaxAngle;
+    }
+
+    int getBSinMinAngle() {
+        return BSinMinAngle;
+    }
+
+    int getBSinMaxAngle() {
+        return BSinMaxAngle;
+    }
+
+    public int[] getProcessed() {
+        return processed;
     }
 }

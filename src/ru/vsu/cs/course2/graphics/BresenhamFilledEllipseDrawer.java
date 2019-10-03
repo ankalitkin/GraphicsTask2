@@ -2,10 +2,10 @@ package ru.vsu.cs.course2.graphics;
 
 import java.awt.*;
 
-public class BresenhamEllipseDrawer implements EllipseDrawer {
+public class BresenhamFilledEllipseDrawer implements EllipseDrawer {
     private GraphicsProvider graphicsProvider;
 
-    public BresenhamEllipseDrawer(GraphicsProvider graphicsProvider) {
+    public BresenhamFilledEllipseDrawer(GraphicsProvider graphicsProvider) {
         this.graphicsProvider = graphicsProvider;
     }
 
@@ -22,23 +22,12 @@ public class BresenhamEllipseDrawer implements EllipseDrawer {
 
     private void drawEllipse(Graphics2D graphics, Ellipse ellipse) {
         int[] pos = ellipse.getProcessed();
-        int lastX = 0;
-        for (int i = pos.length - 1; i >= 0; i--) {
-            while (lastX <= pos[i]) {
-                drawEllipsePixel(graphics, ellipse, lastX, i);
-                if (i > 0 && pos[i - 1] == pos[i]) {
-                    break;
-                }
-                lastX++;
+        for (int y = 0; y < pos.length; y++) {
+            for (int x = -pos[y]; x <= pos[y]; x++) {
+                checkAndDrawPixel(graphics, ellipse, x, y);
+                checkAndDrawPixel(graphics, ellipse, x, -y);
             }
         }
-    }
-
-    private void drawEllipsePixel(Graphics2D graphics, Ellipse ellipse, int x, int y) {
-        checkAndDrawPixel(graphics, ellipse, x, y);
-        checkAndDrawPixel(graphics, ellipse, -x, y);
-        checkAndDrawPixel(graphics, ellipse, -x, -y);
-        checkAndDrawPixel(graphics, ellipse, x, -y);
     }
 
     private void checkAndDrawPixel(Graphics2D graphics, Ellipse ellipse, int x, int y) {
@@ -46,5 +35,4 @@ public class BresenhamEllipseDrawer implements EllipseDrawer {
             graphicsProvider.getPixelDrawer().drawPixel(graphics, ellipse.getXc() + x, ellipse.getYc() + y);
         }
     }
-
 }
