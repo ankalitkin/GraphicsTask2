@@ -21,6 +21,8 @@ public class PiePanel extends JPanel {
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
         PieDrawer pieDrawer = graphicsProvider.getPieDrawer();
-        pieDrawer.drawPie(g, 100, 100, 500, 400, pie.startAngle, pie.endAngle);
+        int w6 = getWidth() / 6;
+        int h6 = getHeight() / 6;
+        pieDrawer.drawPie(g, w6, h6, 5 * w6, 5 * h6, pie.startAngle, pie.endAngle);
     }
 }
