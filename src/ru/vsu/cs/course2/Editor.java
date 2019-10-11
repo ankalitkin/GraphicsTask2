@@ -127,33 +127,25 @@ public class Editor extends JPanel {
 
         gg.drawImage(imageCache, 0, 0, null);
 
+        BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        graphicsProvider.setBufferedImage(img);
+
         LineDrawer lineDrawer = graphicsProvider.getLineDrawer();
         int size = plane.points.size();
         for (int i = 0; i < size - 1; i++) {
             Point p1 = plane.points.get(i);
             Point p2 = plane.points.get((i + 1) % size);
-            //g.setColor(Color.RED);
-            //g.drawLine(p1.x, p1.y, p2.x, p2.y);
             if (p1.equals(selected) || p2.equals(selected))
                 lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
+        g.drawImage(img, 0, 0, null);
 
-        //g.setFont(fontLabel);
-        //g.setColor(Color.BLUE);
-        //int width = g.getFontMetrics().stringWidth(perimeter);
-        //g.drawString(perimeter, getIconWidth() - width - 10, getIconHeight() - 10);
     }
 
     private void revalidateCache() {
         imageCache = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = imageCache.createGraphics();
-        graphicsProvider.setGraphics(g);
-
-        g.setColor(new Color(255, 255, 255, 0));
-        g.fillRect(0, 0, getWidth(), getHeight());
-
+        graphicsProvider.setBufferedImage(imageCache);
         LineDrawer lineDrawer = graphicsProvider.getLineDrawer();
-
         //Draw all except selected
         int size = plane.points.size();
         for (int i = 0; i < size - 1; i++) {
@@ -164,7 +156,6 @@ public class Editor extends JPanel {
             if (!p1.equals(selected) && !p2.equals(selected))
                 lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
-        g.dispose();
     }
 
     private boolean isCacheValid() {

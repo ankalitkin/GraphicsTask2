@@ -1,6 +1,7 @@
 package ru.vsu.cs.course2.graphics;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class GraphicsProvider {
     private Color color;
@@ -10,6 +11,7 @@ public class GraphicsProvider {
     private EllipseDrawer ellipseDrawer;
     private PieDrawer pieDrawer;
     private Graphics2D graphics;
+    private BufferedImage bufferedImage;
 
     public Color getColor() {
         return color;
@@ -71,5 +73,13 @@ public class GraphicsProvider {
 
     public void setGraphics(Graphics2D graphics) {
         this.graphics = graphics;
+    }
+
+    public BufferedImage getBufferedImage() {
+        return bufferedImage;
+    }
+
+    public void setBufferedImage(BufferedImage bufferedImage) {
+        this.bufferedImage = bufferedImage;
     }
 }

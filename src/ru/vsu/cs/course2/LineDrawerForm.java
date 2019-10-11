@@ -5,7 +5,7 @@ import ru.vsu.cs.course2.graphics.*;
 import javax.swing.*;
 import java.awt.*;
 
-public class MainForm {
+public class LineDrawerForm {
     private JPanel drawPanel;
     private JPanel rootPanel;
     private JRadioButton DDARadioButton;
@@ -19,16 +19,16 @@ public class MainForm {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {}
         JFrame frame = new JFrame("Line drawer by @kalitkin_a_v");
-        frame.setContentPane(new MainForm().rootPanel);
+        frame.setContentPane(new LineDrawerForm().rootPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(512, 512);
         frame.setVisible(true);
     }
 
-    private MainForm() {
+    private LineDrawerForm() {
         graphicsProvider = new GraphicsProvider();
         graphicsProvider.setColor(Color.red);
-        graphicsProvider.setPixelDrawer(new GraphicsPixelDrawer(graphicsProvider));
+        graphicsProvider.setPixelDrawer(new BufferedImagePixelDrawer(graphicsProvider));
         DDARadioButton.putClientProperty(LineDrawer.class, new DDALineDrawer(graphicsProvider));
         bresenhamRadioButton.putClientProperty(LineDrawer.class, new BresenhamLineDrawer(graphicsProvider));
         wuRadioButton.putClientProperty(LineDrawer.class, new WuLineDrawer(graphicsProvider));
