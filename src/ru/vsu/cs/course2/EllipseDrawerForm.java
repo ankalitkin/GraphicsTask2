@@ -32,7 +32,7 @@ public class EllipseDrawerForm {
     private EllipseDrawerForm() {
         graphicsProvider = new GraphicsProvider();
         graphicsProvider.setColor(Color.red);
-        graphicsProvider.setPixelDrawer(new NativePixelDrawer(graphicsProvider));
+        graphicsProvider.setPixelDrawer(new GraphicsPixelDrawer(graphicsProvider));
 
         graphicsProvider.setPieDrawer(new PieDrawingWrapper(graphicsProvider));
         DDARadioButton.putClientProperty(LineDrawer.class, new DDALineDrawer(graphicsProvider));

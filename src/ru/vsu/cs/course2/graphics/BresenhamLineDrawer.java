@@ -1,7 +1,5 @@
 package ru.vsu.cs.course2.graphics;
 
-import java.awt.*;
-
 public class BresenhamLineDrawer implements LineDrawer {
     private GraphicsProvider graphicsProvider;
 
@@ -10,7 +8,7 @@ public class BresenhamLineDrawer implements LineDrawer {
     }
 
     @Override
-    public void drawLine(Graphics2D graphics, int x1, int y1, int x2, int y2) {
+    public void drawLine(int x1, int y1, int x2, int y2) {
         int x, y, dx, dy;
         boolean swap = false;
 
@@ -45,9 +43,9 @@ public class BresenhamLineDrawer implements LineDrawer {
         int err = 0;
         for (int i = 0; i <= dx; i++) {
             if (swap)
-                pixelDrawer.drawPixel(graphics, y, x);
+                pixelDrawer.drawPixel(y, x);
             else
-                pixelDrawer.drawPixel(graphics, x, y);
+                pixelDrawer.drawPixel(x, y);
             err += 2 * dy;
             if (err > dx) {
                 err -= 2 * dx;

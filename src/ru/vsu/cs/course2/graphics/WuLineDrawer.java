@@ -1,7 +1,5 @@
 package ru.vsu.cs.course2.graphics;
 
-import java.awt.*;
-
 public class WuLineDrawer implements LineDrawer {
     private GraphicsProvider graphicsProvider;
 
@@ -10,7 +8,7 @@ public class WuLineDrawer implements LineDrawer {
     }
 
     @Override
-    public void drawLine(Graphics2D graphics, int x1, int y1, int x2, int y2) {
+    public void drawLine(int x1, int y1, int x2, int y2) {
         int x, y, dx, dy;
         boolean swap = false;
 
@@ -43,7 +41,7 @@ public class WuLineDrawer implements LineDrawer {
 
         int err = 0;
         for (int i = 0; i <= dx; i++) {
-            drawWuPixel(graphics, x, y, err, dx, swap);
+            drawWuPixel(x, y, err, dx, swap);
             err += 2 * dy;
             if (err > dx) {
                 err -= 2 * dx;
@@ -56,27 +54,27 @@ public class WuLineDrawer implements LineDrawer {
         }
     }
 
-    private void drawWuPixel(Graphics2D graphics, int x, int y, int err, int dx, boolean swap) {
+    private void drawWuPixel(int x, int y, int err, int dx, boolean swap) {
         int d = dx != 0 ? (255 * err) / (2 * dx) : 255;
         int dPos = Math.max(0, d);
         int dNeg = Math.max(0, -d);
         int dMax = 255 - Math.abs(d);
         PixelDrawer pixelDrawer = graphicsProvider.getPixelDrawer();
         if (!swap) {
-            pixelDrawer.drawPixel(graphics, x, y, dMax);
+            pixelDrawer.drawPixel(x, y, dMax);
             if (dx != 0) {
                 if (dPos > 0)
-                    pixelDrawer.drawPixel(graphics, x, y + 1, dPos);
+                    pixelDrawer.drawPixel(x, y + 1, dPos);
                 else
-                    pixelDrawer.drawPixel(graphics, x, y - 1, dNeg);
+                    pixelDrawer.drawPixel(x, y - 1, dNeg);
             }
         } else {
-            pixelDrawer.drawPixel(graphics, y, x, dMax);
+            pixelDrawer.drawPixel(y, x, dMax);
             if (dx != 0) {
                 if (dPos > 0)
-                    pixelDrawer.drawPixel(graphics, y + 1, x, dPos);
+                    pixelDrawer.drawPixel(y + 1, x, dPos);
                 else
-                    pixelDrawer.drawPixel(graphics, y - 1, x, dNeg);
+                    pixelDrawer.drawPixel(y - 1, x, dNeg);
             }
         }
     }

@@ -9,6 +9,7 @@ public class GraphicsProvider {
     private LineDrawer lineDrawer;
     private EllipseDrawer ellipseDrawer;
     private PieDrawer pieDrawer;
+    private Graphics2D graphics;
 
     public Color getColor() {
         return color;
@@ -62,5 +63,13 @@ public class GraphicsProvider {
 
     public void setPieDrawer(PieDrawer pieDrawer) {
         this.pieDrawer = pieDrawer;
+    }
+
+    public Graphics2D getGraphics() {
+        return graphics;
+    }
+
+    public void setGraphics(Graphics2D graphics) {
+        this.graphics = graphics;
     }
 }

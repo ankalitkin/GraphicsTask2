@@ -18,11 +18,12 @@ public class PiePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics gr) {
         Graphics2D g = (Graphics2D) gr;
+        graphicsProvider.setGraphics(g);
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
         PieDrawer pieDrawer = graphicsProvider.getPieDrawer();
         int w6 = getWidth() / 6;
         int h6 = getHeight() / 6;
-        pieDrawer.drawPie(g, w6, h6, 5 * w6, 5 * h6, pie.startAngle, pie.endAngle);
+        pieDrawer.drawPie(w6, h6, 5 * w6, 5 * h6, pie.startAngle, pie.endAngle);
     }
 }

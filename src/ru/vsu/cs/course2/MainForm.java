@@ -11,7 +11,6 @@ public class MainForm {
     private JRadioButton DDARadioButton;
     private JRadioButton bresenhamRadioButton;
     private JRadioButton wuRadioButton;
-    private JCheckBox ellipseCheckBox;
     private Editor editor;
     private final GraphicsProvider graphicsProvider;
 
@@ -29,7 +28,7 @@ public class MainForm {
     private MainForm() {
         graphicsProvider = new GraphicsProvider();
         graphicsProvider.setColor(Color.red);
-        graphicsProvider.setPixelDrawer(new NativePixelDrawer(graphicsProvider));
+        graphicsProvider.setPixelDrawer(new GraphicsPixelDrawer(graphicsProvider));
         DDARadioButton.putClientProperty(LineDrawer.class, new DDALineDrawer(graphicsProvider));
         bresenhamRadioButton.putClientProperty(LineDrawer.class, new BresenhamLineDrawer(graphicsProvider));
         wuRadioButton.putClientProperty(LineDrawer.class, new WuLineDrawer(graphicsProvider));
@@ -48,7 +47,6 @@ public class MainForm {
         DDARadioButton.addActionListener((e) -> reInit());
         bresenhamRadioButton.addActionListener((e) -> reInit());
         wuRadioButton.addActionListener((e) -> reInit());
-        ellipseCheckBox.addActionListener((e) -> reInit());
         reInit();
     }
 

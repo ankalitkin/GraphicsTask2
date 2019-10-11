@@ -1,5 +1,9 @@
 package ru.vsu.cs.course2;
 
+import ru.vsu.cs.course2.Plane.Point;
+import ru.vsu.cs.course2.graphics.GraphicsProvider;
+import ru.vsu.cs.course2.graphics.LineDrawer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -7,9 +11,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
-import ru.vsu.cs.course2.Plane.Point;
-import ru.vsu.cs.course2.graphics.GraphicsProvider;
-import ru.vsu.cs.course2.graphics.LineDrawer;
 
 public class Editor extends JPanel {
     private static HashMap<RenderingHints.Key, Object> rh;
@@ -111,6 +112,7 @@ public class Editor extends JPanel {
             revalidateCache();
         }
         Graphics2D g = (Graphics2D) gg;
+        graphicsProvider.setGraphics(g);
         g.setRenderingHints(rh);
         g.setColor(Color.white);
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -133,7 +135,7 @@ public class Editor extends JPanel {
             //g.setColor(Color.RED);
             //g.drawLine(p1.x, p1.y, p2.x, p2.y);
             if (p1.equals(selected) || p2.equals(selected))
-                lineDrawer.drawLine(g, p1.x, p1.y, p2.x, p2.y);
+                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
 
         //g.setFont(fontLabel);
@@ -145,6 +147,7 @@ public class Editor extends JPanel {
     private void revalidateCache() {
         imageCache = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = imageCache.createGraphics();
+        graphicsProvider.setGraphics(g);
 
         g.setColor(new Color(255, 255, 255, 0));
         g.fillRect(0, 0, getWidth(), getHeight());
@@ -159,7 +162,7 @@ public class Editor extends JPanel {
             //g.setColor(Color.RED);
             //g.drawLine(p1.x, p1.y, p2.x, p2.y);
             if (!p1.equals(selected) && !p2.equals(selected))
-                lineDrawer.drawLine(g, p1.x, p1.y, p2.x, p2.y);
+                lineDrawer.drawLine(p1.x, p1.y, p2.x, p2.y);
         }
         g.dispose();
     }
