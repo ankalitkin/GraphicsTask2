@@ -1,5 +1,7 @@
 package ru.vsu.cs.course2.graphics;
 
+import ru.vsu.cs.course2.ScreenConverter;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -8,10 +10,12 @@ public class GraphicsProvider {
     private Color[] alphaColors;
     private PixelDrawer pixelDrawer;
     private LineDrawer lineDrawer;
-    private EllipseDrawer ellipseDrawer;
-    private PieDrawer pieDrawer;
     private Graphics2D graphics;
     private BufferedImage bufferedImage;
+    private ScreenConverter screenConverter;
+    private PolyLineDrawer polyLineDrawer;
+    private RealLineDrawer realLineDrawer;
+    private CurveDrawer curveDrawer;
 
     public Color getColor() {
         return color;
@@ -51,21 +55,6 @@ public class GraphicsProvider {
         this.lineDrawer = lineDrawer;
     }
 
-    public EllipseDrawer getEllipseDrawer() {
-        return ellipseDrawer;
-    }
-
-    public void setEllipseDrawer(EllipseDrawer ellipseDrawer) {
-        this.ellipseDrawer = ellipseDrawer;
-    }
-
-    public PieDrawer getPieDrawer() {
-        return pieDrawer;
-    }
-
-    public void setPieDrawer(PieDrawer pieDrawer) {
-        this.pieDrawer = pieDrawer;
-    }
 
     public Graphics2D getGraphics() {
         return graphics;
@@ -81,5 +70,37 @@ public class GraphicsProvider {
 
     public void setBufferedImage(BufferedImage bufferedImage) {
         this.bufferedImage = bufferedImage;
+    }
+
+    public ScreenConverter getScreenConverter() {
+        return screenConverter;
+    }
+
+    public void setScreenConverter(ScreenConverter screenConverter) {
+        this.screenConverter = screenConverter;
+    }
+
+    public PolyLineDrawer getPolyLineDrawer() {
+        return polyLineDrawer;
+    }
+
+    public void setPolyLineDrawer(PolyLineDrawer polyLineDrawer) {
+        this.polyLineDrawer = polyLineDrawer;
+    }
+
+    public RealLineDrawer getRealLineDrawer() {
+        return realLineDrawer;
+    }
+
+    public void setRealLineDrawer(RealLineDrawer realLineDrawer) {
+        this.realLineDrawer = realLineDrawer;
+    }
+
+    public CurveDrawer getCurveDrawer() {
+        return curveDrawer;
+    }
+
+    public void setCurveDrawer(CurveDrawer curveDrawer) {
+        this.curveDrawer = curveDrawer;
     }
 }

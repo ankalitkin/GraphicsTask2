@@ -1,5 +1,7 @@
 package ru.vsu.cs.course2.graphics;
 
+import ru.vsu.cs.course2.ScreenPoint;
+
 public interface LineDrawer {
-    void drawLine(int x1, int y1, int x2, int y2);
+    void drawLine(ScreenPoint p1, ScreenPoint p2);
 }

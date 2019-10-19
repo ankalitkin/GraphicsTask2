@@ -1,5 +1,7 @@
 package ru.vsu.cs.course2.graphics;
 
+import ru.vsu.cs.course2.ScreenPoint;
+
 public class BresenhamLineDrawer implements LineDrawer {
     private GraphicsProvider graphicsProvider;
 
@@ -8,7 +10,12 @@ public class BresenhamLineDrawer implements LineDrawer {
     }
 
     @Override
-    public void drawLine(int x1, int y1, int x2, int y2) {
+    public void drawLine(ScreenPoint p1, ScreenPoint p2) {
+        int x1 = p1.getX();
+        int y1 = p1.getY();
+        int x2 = p2.getX();
+        int y2 = p2.getY();
+
         int x, y, dx, dy;
         boolean swap = false;
 
