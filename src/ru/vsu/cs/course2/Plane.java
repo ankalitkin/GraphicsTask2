@@ -1,37 +1,32 @@
 package ru.vsu.cs.course2;
 
-import ru.vsu.cs.course2.graphics.GraphicsProvider;
+import ru.vsu.cs.course2.figures.RealPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
 class Plane {
     class Point {
-        Vector2 vect;
+        RealPoint vect;
         int z;
 
-        Point(Vector2 vect, int z) {
+        Point(RealPoint vect, int z) {
             this.vect = vect;
             this.z = z;
         }
     }
 
-    private GraphicsProvider graphicsProvider;
     ArrayList<Point> points = new ArrayList<>();
     private int z;
 
-    public Plane(GraphicsProvider graphicsProvider) {
-        this.graphicsProvider = graphicsProvider;
-    }
-
-    public Point newPoint(int x, int y, int z) {
-        Vector2 realPoint = VectorFromScreen(x, y);
+    public Point newPoint(ScreenConverter sc, int x, int y, int z) {
+        RealPoint realPoint = VectorFromScreen(sc, x, y);
         return new Point(realPoint, z);
     }
 
-    public Vector2 VectorFromScreen(int x, int y) {
+    public RealPoint VectorFromScreen(ScreenConverter sc, int x, int y) {
         ScreenPoint screenPoint = new ScreenPoint(x, y);
-        return graphicsProvider.getScreenConverter().screenToReal(screenPoint);
+        return sc.screenToReal(screenPoint);
     }
 
 
@@ -39,11 +34,11 @@ class Plane {
         return z++;
     }
 
-    Point getClosest(int x, int y, int dx, int dy) {
+    Point getClosest(ScreenConverter sc, int x, int y, int dx, int dy) {
         Point closest = null;
         for (Point point : points) {
-            if (Math.abs(x - getX(point)) < dx
-                    && Math.abs(y - getY(point)) < dy
+            if (Math.abs(x - getX(sc, point)) < dx
+                    && Math.abs(y - getY(sc, point)) < dy
                     && (closest == null || point.z > closest.z)) {
                 closest = point;
             }
@@ -51,22 +46,22 @@ class Plane {
         return closest;
     }
 
-    Point addNewPoint(int x, int y) {
-        Point p = newPoint(x, y, nextZ());
+    Point addNewPoint(ScreenConverter sc, int x, int y) {
+        Point p = newPoint(sc, x, y, nextZ());
         points.add(p);
         return p;
     }
 
-    private int getX(Point point) {
-        return graphicsProvider.getScreenConverter().realToScreen(point.vect).x;
+    private int getX(ScreenConverter sc, Point point) {
+        return sc.realToScreen(point.vect).x;
     }
 
-    private int getY(Point point) {
-        return graphicsProvider.getScreenConverter().realToScreen(point.vect).y;
+    private int getY(ScreenConverter sc, Point point) {
+        return sc.realToScreen(point.vect).y;
     }
 
-    public List<Vector2> getPoints() {
-        ArrayList<Vector2> list = new ArrayList<>(points.size());
+    public List<RealPoint> getPoints() {
+        ArrayList<RealPoint> list = new ArrayList<>(points.size());
         for (Point point : points) {
             list.add(point.vect);
         }

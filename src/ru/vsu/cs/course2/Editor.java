@@ -1,14 +1,14 @@
 package ru.vsu.cs.course2;
 
 import ru.vsu.cs.course2.Plane.Point;
-import ru.vsu.cs.course2.graphics.CurveDrawer;
-import ru.vsu.cs.course2.graphics.GraphicsProvider;
+import ru.vsu.cs.course2.figures.*;
+import ru.vsu.cs.course2.figures.Stroke;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.List;
 
 public class Editor extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
     private static HashMap<RenderingHints.Key, Object> rh;
@@ -16,19 +16,26 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
     private final int dx = 4, dy = 4;
     private Plane plane;
     private Point selected;
-    GraphicsProvider graphicsProvider;
+    ScreenConverter sc;
 
     private java.awt.Point oldPoint = null;
     private int buttonNumber = -1;
 
-    Editor(Plane plane, GraphicsProvider graphicsProvider) {
+    Editor(Plane plane) {
         this.plane = plane;
-        this.graphicsProvider = graphicsProvider;
         rh = new HashMap<>();
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+    }
+
+    public ScreenConverter getScreenConverter() {
+        return sc;
+    }
+
+    public void setScreenConverter(ScreenConverter sc) {
+        this.sc = sc;
     }
 
     public void setPlane(Plane plane) {
@@ -46,15 +53,16 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        BufferedImage bi = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-        graphicsProvider.setBufferedImage(bi);
         for (int i = 0; i < plane.points.size(); i++) {
             drawButton(g, i);
         }
-        CurveDrawer cd = graphicsProvider.getCurveDrawer();
-        cd.drawCurve(plane.getPoints());
 
-        g.drawImage(bi, 0, 0, null);
+        List<RealPoint> points = plane.getPoints();
+        if(points.size() > 2) {
+            Figure figure = new Figure(points, 0);
+            Drawable drawable = new Stroke(new ClosedCurved(figure), Color.red, 1);
+            drawable.draw(sc, g);
+        }
     }
 
     private void drawButton(Graphics2D g, int i) {
@@ -70,7 +78,7 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
     }
 
     private ScreenPoint getScreenPoint(Point point) {
-        return graphicsProvider.getScreenConverter().realToScreen(point.vect);
+        return sc.realToScreen(point.vect);
     }
 
     private int getY(Point point) {
@@ -86,9 +94,9 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
     @Override
     public void mousePressed(MouseEvent e) {
         buttonNumber = e.getButton();
-        selected = plane.getClosest(e.getX(), e.getY(), dx, dy);
+        selected = plane.getClosest(sc, e.getX(), e.getY(), dx, dy);
         if (selected == null && e.getButton() == MouseEvent.BUTTON1) {
-            selected = plane.addNewPoint(e.getX(), e.getY());
+            selected = plane.addNewPoint(sc, e.getX(), e.getY());
         } else if (selected != null && e.getButton() == MouseEvent.BUTTON3) {
             plane.points.remove(selected);
             selected = null;
@@ -119,7 +127,7 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
             if (oldPoint != null) {
                 int dx = e.getX() - oldPoint.x;
                 int dy = e.getY() - oldPoint.y;
-                graphicsProvider.getScreenConverter().translateOnScreen(-dx, -dy);
+                sc.translateOnScreen(-dx, -dy);
             }
             oldPoint = e.getPoint();
             redraw();
@@ -127,7 +135,7 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
 
         if (selected == null)
             return;
-        selected.vect = plane.VectorFromScreen(e.getX(), e.getY());
+        selected.vect = plane.VectorFromScreen(sc, e.getX(), e.getY());
         selected.z = plane.nextZ();
         redraw();
     }
@@ -139,7 +147,7 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        graphicsProvider.getScreenConverter().scale(e.getPoint(), e.getPreciseWheelRotation() * (-0.1));
+        sc.scale(e.getPoint(), e.getPreciseWheelRotation() * (-0.1));
         redraw();
     }
 }

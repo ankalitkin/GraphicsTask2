@@ -1,5 +1,7 @@
 package ru.vsu.cs.course2;
 
+import ru.vsu.cs.course2.figures.RealPoint;
+
 public class ScreenConverter {
     private Editor editor;
     private double x0, y0;
@@ -9,16 +11,16 @@ public class ScreenConverter {
         this.editor = editor;
     }
 
-    public ScreenPoint realToScreen(Vector2 point) {
+    public ScreenPoint realToScreen(RealPoint point) {
         double x = (point.getX() - x0) * scale + getScreenCenterX();
         double y = (y0 - point.getY()) * scale + getScreenCenterY();
         return new ScreenPoint((int) x, (int) y);
     }
 
-    public Vector2 screenToReal(ScreenPoint p) {
+    public RealPoint screenToReal(ScreenPoint p) {
         double x = x0 + (p.getX() - getScreenCenterX()) / scale;
         double y = y0 - (p.getY() - getScreenCenterY()) / scale;
-        return new Vector2(x, y);
+        return new RealPoint(x, y);
     }
 
     public void translate(double x, double y) {
@@ -29,7 +31,6 @@ public class ScreenConverter {
     public void translateOnScreen(double x, double y) {
         translate(x / scale, -y / scale);
     }
-
 
     public double getScale() {
         return scale;
