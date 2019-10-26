@@ -29,7 +29,6 @@ class Plane {
         return sc.screenToReal(screenPoint);
     }
 
-
     int nextZ() {
         return z++;
     }

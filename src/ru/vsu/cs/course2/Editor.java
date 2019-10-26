@@ -53,15 +53,19 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, getWidth(), getHeight());
 
-        for (int i = 0; i < plane.points.size(); i++) {
-            drawButton(g, i);
+        List<RealPoint> points = plane.getPoints();
+        if (points.size() > 2) {
+            Figure figure = new Figure(points, 0);
+            Drawable drawable = new Filled(new Stroke(new ClosedCurved(figure), Color.red, 1), Color.yellow);
+            //Drawable drawable = new Stroke(new ClosedCurved(figure), Color.red, 1);
+            //Drawable drawable = new Filled(new Stroke(new Closed(figure), Color.red, 1),Color.yellow);
+            drawable.draw(sc, g);
+
+            //drawPointIcons(g, drawable.getOutlinePoints());
         }
 
-        List<RealPoint> points = plane.getPoints();
-        if(points.size() > 2) {
-            Figure figure = new Figure(points, 0);
-            Drawable drawable = new Stroke(new ClosedCurved(figure), Color.red, 1);
-            drawable.draw(sc, g);
+        for (int i = 0; i < plane.points.size(); i++) {
+            drawButton(g, i);
         }
     }
 
@@ -71,6 +75,19 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
         g.fillRect(getX(point) - dx, getY(point) - dy, 2 * dx, 2 * dy);
         g.setFont(numbersFont);
         g.drawString(String.valueOf(i), getX(point) + dx, getY(point) + dy);
+    }
+
+    private void drawPointIcons(Graphics2D g, List<RealPoint> points) {
+        int i = 0;
+        for (RealPoint point : points) {
+            ScreenPoint screenPoint = sc.realToScreen(point);
+            int px = screenPoint.getX();
+            int py = screenPoint.getY();
+            g.setColor(Color.green);
+            g.fillRect(px - dx, py - dy, 2 * dx, 2 * dy);
+            g.setFont(numbersFont);
+            g.drawString(String.valueOf(i++), px + dx, py + dy);
+        }
     }
 
     private int getX(Point point) {

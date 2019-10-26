@@ -55,4 +55,8 @@ public class ScreenConverter {
     public int getScreenCenterY() {
         return editor.getHeight() / 2;
     }
+
+    public ScreenPoint getCenter() {
+        return new ScreenPoint(getScreenCenterX(), getScreenCenterY());
+    }
 }

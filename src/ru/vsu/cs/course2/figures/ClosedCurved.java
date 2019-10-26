@@ -30,7 +30,7 @@ public class ClosedCurved implements Drawable {
             RealPoint a, b;
             a = wayPoints.get(0);
             points.add(a);
-            for (int i = 1; i <=  count; i++) {
+            for (int i = 1; i <= count; i++) {
                 b = wayPoints.get(i % count);
                 points.add(lerp(a, b, .5));
                 points.add(b);
@@ -42,25 +42,23 @@ public class ClosedCurved implements Drawable {
 
     private RealPoint getValueAt(double position) {
         int length = keyPoints.length;
-        int s = (int) (position * length);
-        int n = (int) (position * length - 1) / 2;
+        int s = (int) (position * (length - 1));
+        int n = (int) ((position * (length - 1) - 1) / 2);
         if (s < 0 || s > length)
             throw new IllegalArgumentException();
 
-        double amount = position * length % 1;
+        double amount = position * (length - 1) % 1;
         if (s == 0 || s == length - 1) {
-            return bezier(keyPoints[length-2], keyPoints[0], keyPoints[1], (1 + amount) / 2);
-            //return keyPoints[1];
+            return bezier(keyPoints[length - 2], keyPoints[0], keyPoints[1], (1 + amount) / 2);
         } else if (s >= length - 2) {
-            return bezier(keyPoints[length-2], keyPoints[0], keyPoints[1], amount / 2);
-            //return keyPoints[length-2];
+            return bezier(keyPoints[length - 2], keyPoints[0], keyPoints[1], amount / 2);
         }
 
-        double bmount = ((position * length - 1) % 2) / 2;
+        amount = ((position * (length - 1) - 1) % 2) / 2;
         RealPoint a = keyPoints[2 * n + 1];
         RealPoint b = keyPoints[2 * n + 2];
         RealPoint c = keyPoints[2 * n + 3];
-        return bezier(a, b, c, bmount);
+        return bezier(a, b, c, amount);
     }
 
     public void splitAt(double position) {
