@@ -7,7 +7,6 @@ import java.awt.*;
 import java.util.List;
 
 public class Filled implements Drawable {
-    private static final Color TRANSPARENT = new Color(0, 0, 0, 0);
     private Drawable drawable;
     private Color color;
 
@@ -26,25 +25,18 @@ public class Filled implements Drawable {
         List<RealPoint> points = drawable.getOutlinePoints();
         if (points.size() < 3)
             return;
-
-        graphics2D.setXORMode(Color.white);
         graphics2D.setColor(color);
-        ScreenPoint origin = screenConverter.getCenter();
-        ScreenPoint lastScreenPoint = screenConverter.realToScreen(points.get(points.size() - 1));
-        for (RealPoint point : points) {
-            ScreenPoint currentScreenPoint = screenConverter.realToScreen(point);
-            //if(lastScreenPoint != null)
-            drawTriangle(graphics2D, origin, lastScreenPoint, currentScreenPoint);
-            lastScreenPoint = currentScreenPoint;
+        int[] xPoints = new int[points.size()];
+        int[] yPoints = new int[points.size()];
+        int i = 0;
+        for (RealPoint outlinePoint : points) {
+            ScreenPoint point = screenConverter.realToScreen(outlinePoint);
+            xPoints[i] = point.getX();
+            yPoints[i] = point.getY();
+            i++;
         }
+        graphics2D.fillPolygon(xPoints, yPoints, points.size());
 
-        graphics2D.setPaintMode();
         drawable.draw(screenConverter, graphics2D);
-    }
-
-    private void drawTriangle(Graphics2D graphics2D, ScreenPoint origin, ScreenPoint lastScreenPoint, ScreenPoint currentScreenPoint) {
-        int[] xPoints = {origin.getX(), lastScreenPoint.getX(), currentScreenPoint.getX()};
-        int[] yPoints = {origin.getY(), lastScreenPoint.getY(), currentScreenPoint.getY()};
-        graphics2D.fillPolygon(xPoints, yPoints, 3);
     }
 }

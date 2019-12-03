@@ -1,8 +1,8 @@
 package ru.vsu.cs.course2;
 
 import ru.vsu.cs.course2.Plane.Point;
-import ru.vsu.cs.course2.figures.*;
 import ru.vsu.cs.course2.figures.Stroke;
+import ru.vsu.cs.course2.figures.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,10 +57,8 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
         if (points.size() > 2) {
             Figure figure = new Figure(points, 0);
             Drawable drawable = new Filled(new Stroke(new ClosedCurved(figure), Color.red, 1), Color.yellow);
-            //Drawable drawable = new Stroke(new ClosedCurved(figure), Color.red, 1);
-            //Drawable drawable = new Filled(new Stroke(new Closed(figure), Color.red, 1),Color.yellow);
+            //Drawable drawable = new Filled(new Stroke(figure, Color.red, 1), Color.yellow);
             drawable.draw(sc, g);
-
             //drawPointIcons(g, drawable.getOutlinePoints());
         }
 

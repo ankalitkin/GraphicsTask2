@@ -81,7 +81,9 @@ public class ClosedCurved implements Drawable {
     public List<RealPoint> getOutlinePoints() {
         if (keyPoints.length <= 2)
             return Arrays.asList(keyPoints);
-        return new ArrayList<>(points.values());
+        List<RealPoint> realPoints = new ArrayList<>(points.values());
+        realPoints.add(realPoints.get(realPoints.size() - 1));
+        return realPoints;
     }
 
     @Override

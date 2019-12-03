@@ -33,13 +33,17 @@ public class Stroke implements Drawable{
     @Override
     public void draw(ScreenConverter screenConverter, Graphics2D graphics2D) {
         graphics2D.setColor(color);
-
-        ScreenPoint last = null;
-        for(RealPoint outlinePoint : drawable.getOutlinePoints()) {
+        List<RealPoint> points = drawable.getOutlinePoints();
+        int[] xPoints = new int[points.size()];
+        int[] yPoints = new int[points.size()];
+        int i = 0;
+        for (RealPoint outlinePoint : points) {
             ScreenPoint point = screenConverter.realToScreen(outlinePoint);
-            if (last != null)
-                graphics2D.drawLine(last.getX(), last.getY(), point.getX(), point.getY());
-            last = point;
+            xPoints[i] = point.getX();
+            yPoints[i] = point.getY();
+            i++;
         }
+        graphics2D.setStroke(new BasicStroke((float) (screenConverter.getScale() * thickness)));
+        graphics2D.drawPolygon(new Polygon(xPoints, yPoints, points.size()));
     }
 }
