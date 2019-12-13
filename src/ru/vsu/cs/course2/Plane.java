@@ -5,7 +5,7 @@ import ru.vsu.cs.course2.figures.RealPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-class Plane {
+public class Plane {
     class Point {
         RealPoint vect;
         int z;

@@ -2,13 +2,15 @@ package ru.vsu.cs.course2;
 
 import ru.vsu.cs.course2.figures.RealPoint;
 
+import javax.swing.*;
+
 public class ScreenConverter {
-    private Editor editor;
+    private JPanel parent;
     private double x0, y0;
     private double scale = 1;
 
-    public ScreenConverter(Editor editor) {
-        this.editor = editor;
+    public ScreenConverter(JPanel parent) {
+        this.parent = parent;
     }
 
     public ScreenPoint realToScreen(RealPoint point) {
@@ -49,11 +51,11 @@ public class ScreenConverter {
     }
 
     public int getScreenCenterX() {
-        return editor.getWidth() / 2;
+        return parent.getWidth() / 2;
     }
 
     public int getScreenCenterY() {
-        return editor.getHeight() / 2;
+        return parent.getHeight() / 2;
     }
 
     public ScreenPoint getCenter() {

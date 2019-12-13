@@ -1,5 +1,6 @@
 package ru.vsu.cs.course2.figures;
 
+import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
@@ -25,5 +26,10 @@ public class Closed implements Drawable {
     @Override
     public void draw(ScreenConverter screenConverter, Graphics2D graphics2D) {
         drawable.draw(screenConverter, graphics2D);
+    }
+
+    @Override
+    public Plane getPlane() {
+        return drawable.getPlane();
     }
 }

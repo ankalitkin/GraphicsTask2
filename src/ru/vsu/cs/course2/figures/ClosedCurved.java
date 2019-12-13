@@ -1,24 +1,18 @@
 package ru.vsu.cs.course2.figures;
 
+import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 
 public class ClosedCurved implements Drawable {
     private Drawable drawable;
-    private RealPoint[] keyPoints;
-    private TreeMap<Double, RealPoint> points = new TreeMap<>();
 
     public ClosedCurved(Drawable drawable) {
         this.drawable = drawable;
-        List<RealPoint> points = addMiddlePoints(drawable.getOutlinePoints());
-        this.keyPoints = points.toArray(new RealPoint[0]);
-        for (double i = 0; i <= 1; i += 1.0 / (10 * points.size()))
-            splitAt(i);
     }
 
     private static ArrayList<RealPoint> addMiddlePoints(List<RealPoint> wayPoints) {
@@ -40,7 +34,7 @@ public class ClosedCurved implements Drawable {
         return points;
     }
 
-    private RealPoint getValueAt(double position) {
+    private RealPoint getValueAt(RealPoint[] keyPoints, double position) {
         int length = keyPoints.length;
         int s = (int) (position * (length - 1));
         int n = (int) ((position * (length - 1) - 1) / 2);
@@ -61,10 +55,6 @@ public class ClosedCurved implements Drawable {
         return bezier(a, b, c, amount);
     }
 
-    public void splitAt(double position) {
-        points.put(position, getValueAt(position));
-    }
-
     private static RealPoint lerp(RealPoint v1, RealPoint v2, double value) {
         double newX = v1.getX() * (1 - value) + v2.getX() * value;
         double newY = v1.getY() * (1 - value) + v2.getY() * value;
@@ -79,9 +69,16 @@ public class ClosedCurved implements Drawable {
 
     @Override
     public List<RealPoint> getOutlinePoints() {
-        if (keyPoints.length <= 2)
-            return Arrays.asList(keyPoints);
-        List<RealPoint> realPoints = new ArrayList<>(points.values());
+        List<RealPoint> points = addMiddlePoints(drawable.getOutlinePoints());
+        if (points.size() <= 2)
+            return new ArrayList<>(points);
+        RealPoint[] keyPoints = points.toArray(new RealPoint[0]);
+
+        TreeMap<Double, RealPoint> pointMap = new TreeMap<>();
+        for (double i = 0; i <= 1; i += 1.0 / (10 * points.size()))
+            pointMap.put(i, getValueAt(keyPoints, i));
+
+        List<RealPoint> realPoints = new ArrayList<>(pointMap.values());
         realPoints.add(realPoints.get(realPoints.size() - 1));
         return realPoints;
     }
@@ -92,4 +89,8 @@ public class ClosedCurved implements Drawable {
         drawable.draw(screenConverter, graphics2D);
     }
 
+    @Override
+    public Plane getPlane() {
+        return drawable.getPlane();
+    }
 }

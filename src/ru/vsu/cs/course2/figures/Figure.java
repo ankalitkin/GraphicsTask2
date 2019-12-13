@@ -1,38 +1,29 @@
 package ru.vsu.cs.course2.figures;
 
+import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
 import java.util.List;
 
 public class Figure implements Drawable{
-    private List<RealPoint> points;
-    private int z_index;
+    private Plane plane;
 
-    public Figure(List<RealPoint> points, int z_index) {
-        this.points = points;
-        this.z_index = z_index;
+    public Figure(Plane plane) {
+        this.plane = plane;
     }
 
-    public List<RealPoint> getPoints() {
-        return points;
+    public Plane getPlane() {
+        return plane;
     }
 
-    public void setPoints(List<RealPoint> points) {
-        this.points = points;
-    }
-
-    public int getZ_index() {
-        return z_index;
-    }
-
-    public void setZ_index(int z_index) {
-        this.z_index = z_index;
+    public void setPlane(Plane plane) {
+        this.plane = plane;
     }
 
     @Override
     public List<RealPoint> getOutlinePoints() {
-        return getPoints();
+        return plane.getPoints();
     }
 
     @Override

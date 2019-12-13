@@ -1,5 +1,6 @@
 package ru.vsu.cs.course2.figures;
 
+import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 import ru.vsu.cs.course2.ScreenPoint;
 
@@ -44,6 +45,11 @@ public class Stroke implements Drawable{
             i++;
         }
         graphics2D.setStroke(new BasicStroke((float) (screenConverter.getScale() * thickness)));
-        graphics2D.drawPolygon(new Polygon(xPoints, yPoints, points.size()));
+        graphics2D.drawPolyline(xPoints, yPoints, points.size());
+    }
+
+    @Override
+    public Plane getPlane() {
+        return drawable.getPlane();
     }
 }

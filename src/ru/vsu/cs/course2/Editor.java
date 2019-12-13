@@ -1,33 +1,40 @@
 package ru.vsu.cs.course2;
 
 import ru.vsu.cs.course2.Plane.Point;
-import ru.vsu.cs.course2.figures.Stroke;
-import ru.vsu.cs.course2.figures.*;
+import ru.vsu.cs.course2.figures.Drawable;
+import ru.vsu.cs.course2.figures.RealPoint;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.List;
 
-public class Editor extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener {
+public class Editor implements MouseListener, MouseMotionListener, MouseWheelListener, Drawable {
     private static HashMap<RenderingHints.Key, Object> rh;
     private final Font numbersFont = new Font("Segoe UI", Font.PLAIN, 16);
     private final int dx = 4, dy = 4;
     private Plane plane;
     private Point selected;
-    ScreenConverter sc;
 
+    static {
+        rh = new HashMap<>();
+        rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+    }
     private java.awt.Point oldPoint = null;
     private int buttonNumber = -1;
 
-    Editor(Plane plane) {
+    private ScreenConverter sc;
+    private Runnable redrawCallback;
+
+    public Editor(Plane plane, ScreenConverter sc, Runnable redrawCallback) {
         this.plane = plane;
-        rh = new HashMap<>();
-        rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        addMouseListener(this);
-        addMouseMotionListener(this);
-        addMouseWheelListener(this);
+        this.sc = sc;
+        this.redrawCallback = redrawCallback;
+    }
+
+    public Editor(Plane plane, Runnable redrawCallback) {
+        this.plane = plane;
+        this.redrawCallback = redrawCallback;
     }
 
     public ScreenConverter getScreenConverter() {
@@ -42,26 +49,9 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
         this.plane = plane;
     }
 
-    private void redraw() {
-        paintImmediately(0, 0, getWidth(), getHeight());
-    }
-
     @Override
-    public void paintComponent(Graphics gg) {
-        Graphics2D g = (Graphics2D) gg;
+    public void draw(ScreenConverter screenConverter, Graphics2D g) {
         g.setRenderingHints(rh);
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, getWidth(), getHeight());
-
-        List<RealPoint> points = plane.getPoints();
-        if (points.size() > 2) {
-            Figure figure = new Figure(points, 0);
-            Drawable drawable = new Filled(new Stroke(new ClosedCurved(figure), Color.red, 1), Color.yellow);
-            //Drawable drawable = new Filled(new Stroke(figure, Color.red, 1), Color.yellow);
-            drawable.draw(sc, g);
-            //drawPointIcons(g, drawable.getOutlinePoints());
-        }
-
         for (int i = 0; i < plane.points.size(); i++) {
             drawButton(g, i);
         }
@@ -116,7 +106,7 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
             plane.points.remove(selected);
             selected = null;
         }
-        redraw();
+        redrawCallback.run();
     }
 
     @Override
@@ -145,14 +135,14 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
                 sc.translateOnScreen(-dx, -dy);
             }
             oldPoint = e.getPoint();
-            redraw();
+            redrawCallback.run();
         }
 
         if (selected == null)
             return;
         selected.vect = plane.VectorFromScreen(sc, e.getX(), e.getY());
         selected.z = plane.nextZ();
-        redraw();
+        redrawCallback.run();
     }
 
     @Override
@@ -163,6 +153,12 @@ public class Editor extends JPanel implements MouseListener, MouseMotionListener
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         sc.scale(e.getPoint(), e.getPreciseWheelRotation() * (-0.1));
-        redraw();
+        redrawCallback.run();
     }
+
+    @Override
+    public List<RealPoint> getOutlinePoints() {
+        return null;
+    }
+
 }
