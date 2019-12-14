@@ -4,6 +4,9 @@ import ru.vsu.cs.course2.figures.Drawable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,6 +105,16 @@ public class CurveDrawerForm {
         sFillSlider.addChangeListener(e -> updateFigureConfiguration());
         vFillSlider.addChangeListener(e -> updateFigureConfiguration());
         aFillSlider.addChangeListener(e -> updateFigureConfiguration());
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                List<FigureConfiguration> list = new ArrayList<>();
+                for (int i = 0; i < figuresListModel.size(); i++) {
+                    list.add(figuresListModel.get(i));
+                }
+                System.out.println(Utils.toJson(new Picture(list)));
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -178,7 +191,6 @@ public class CurveDrawerForm {
 
     private FigureConfiguration getFigureConfiguration() {
         int index = figures.getSelectedIndex();
-        System.out.println(index);
         if (index < 0)
             return null;
         return figuresListModel.get(index);
