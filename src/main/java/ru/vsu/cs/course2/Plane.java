@@ -1,10 +1,14 @@
 package ru.vsu.cs.course2;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.vsu.cs.course2.figures.RealPoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Data
 public class Plane {
     ArrayList<Point> points = new ArrayList<>();
     private int z;
@@ -57,14 +61,11 @@ public class Plane {
         return list;
     }
 
-    class Point {
-        RealPoint vect;
-        int z;
-
-        Point(RealPoint vect, int z) {
-            this.vect = vect;
-            this.z = z;
+    @JsonSetter
+    private void setPoints(List<RealPoint> list) {
+        points = new ArrayList<>(list.size());
+        for (RealPoint point : list) {
+            points.add(new Point(point, z++));
         }
     }
-
 }

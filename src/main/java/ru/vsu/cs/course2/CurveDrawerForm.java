@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CurveDrawerForm {
+    private static final String CHOOSE_OPEN_FILE_MESSAGE = "Open file";
+    private static final String CHOOSE_SAVE_FILE_MESSAGE = "Save file";
     private final ScreenConverter screenConverter;
     private final Canvas canvas;
     private JPanel drawPanel;
@@ -105,17 +107,43 @@ public class CurveDrawerForm {
         sFillSlider.addChangeListener(e -> updateFigureConfiguration());
         vFillSlider.addChangeListener(e -> updateFigureConfiguration());
         aFillSlider.addChangeListener(e -> updateFigureConfiguration());
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<FigureConfiguration> list = new ArrayList<>();
-                for (int i = 0; i < figuresListModel.size(); i++) {
-                    list.add(figuresListModel.get(i));
-                }
-                System.out.println(Utils.toJson(new Picture(list)));
-            }
+        saveButton.addActionListener(e -> {
+            Picture picture = getPicture();
+            String filename = browseSaveFile();
+            if (filename == null)
+                return;
+            Utils.saveToFile(filename, picture);
+        });
+
+        loadButton.addActionListener(e -> {
+            String filename = browseOpenFile();
+            if (filename == null)
+                return;
+            Picture picture = Utils.loadFromFile(filename);
+            if (picture == null)
+                return;
+            setPicture(picture);
         });
     }
+
+    private Picture getPicture() {
+        List<FigureConfiguration> list = new ArrayList<>();
+        for (int i = 0; i < figuresListModel.size(); i++) {
+            list.add(figuresListModel.get(i));
+        }
+        return new Picture(list);
+    }
+
+    private void setPicture(Picture picture) {
+        figuresListModel.clear();
+        if (picture == null)
+            return;
+        List<FigureConfiguration> list = picture.getFigures();
+        for (FigureConfiguration fc : list) {
+            figuresListModel.addElement(fc);
+        }
+    }
+
 
     public static void main(String[] args) {
         try {
@@ -249,5 +277,35 @@ public class CurveDrawerForm {
         canvas.setFigures(figuresList);
         canvas.setEditor(createEditor());
         canvas.repaint();
+    }
+
+    private String browseSaveFile() {
+        FileDialog fileDialog = new FileDialog((Frame) null, CHOOSE_SAVE_FILE_MESSAGE);
+        fileDialog.setMode(FileDialog.SAVE);
+        fileDialog.setFile("figure.json");
+        fileDialog.setVisible(true);
+
+        String dir = fileDialog.getDirectory();
+        String file = fileDialog.getFile();
+        if (dir != null && file != null) {
+            if (file.contains("."))
+                return dir + file;
+            else
+                return String.format("%s%s.json", dir, file);
+        }
+        return null;
+    }
+
+    private String browseOpenFile() {
+        FileDialog fileDialog = new FileDialog((Frame) null, CHOOSE_OPEN_FILE_MESSAGE);
+        fileDialog.setMode(FileDialog.LOAD);
+        fileDialog.setVisible(true);
+
+        String dir = fileDialog.getDirectory();
+        String file = fileDialog.getFile();
+        if (dir != null && file != null) {
+            return dir + file;
+        }
+        return null;
     }
 }

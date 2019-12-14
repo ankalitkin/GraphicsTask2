@@ -9,14 +9,15 @@ import java.awt.*;
 public class FigureConfiguration {
     private static int counter = 0;
     private Plane plane = new Plane();
+    private String name = "";
     private boolean isVisible = true;
     private boolean isClosed;
     private boolean isCurved;
     private boolean isStroked = true;
-    private int strokeColorRGB = Color.black.getRGB();
+    private float[] strokeRGBA = Color.black.getRGBComponents(null);
     private int strokeThickness = 1;
     private boolean isFilled;
-    private int fillColorRGB = Color.white.getRGB();
+    private float[] fillRGBA = Color.white.getRGBComponents(null);
     private int number = ++counter;
 
     public static void setCounter(int counter) {
@@ -25,20 +26,20 @@ public class FigureConfiguration {
 
     @JsonIgnore
     public Color getStrokeColor() {
-        return new Color(strokeColorRGB);
+        return new Color(strokeRGBA[0], strokeRGBA[1], strokeRGBA[2], strokeRGBA[3]);
     }
 
     public void setStrokeColor(Color strokeColor) {
-        this.strokeColorRGB = strokeColor.getRGB();
+        this.strokeRGBA = strokeColor.getComponents(null);
     }
 
     @JsonIgnore
     public Color getFillColor() {
-        return new Color(fillColorRGB);
+        return new Color(fillRGBA[0], fillRGBA[1], fillRGBA[2], fillRGBA[3]);
     }
 
     public void setFillColor(Color fillColor) {
-        this.fillColorRGB = fillColor.getRGB();
+        this.fillRGBA = fillColor.getComponents(null);
     }
 
     public static FigureConfiguration getSampleFigureConfiguration() {
@@ -52,21 +53,9 @@ public class FigureConfiguration {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("#");
-        sb.append(number);
-        sb.append(" ");
-        if (isVisible)
-            sb.append("Vis");
-        if (isClosed)
-            sb.append("Cls");
-        if (isCurved)
-            sb.append("Cur");
-        if (isStroked)
-            sb.append("Str");
-        if (isFilled)
-            sb.append("Fil");
-        return sb.toString();
+        if (name.length() == 0)
+            return String.format("Figure %d", number);
+        return name;
     }
 
 }

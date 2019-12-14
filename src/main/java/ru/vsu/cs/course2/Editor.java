@@ -1,6 +1,5 @@
 package ru.vsu.cs.course2;
 
-import ru.vsu.cs.course2.Plane.Point;
 import ru.vsu.cs.course2.figures.Drawable;
 import ru.vsu.cs.course2.figures.RealPoint;
 

@@ -1,7 +1,7 @@
 package ru.vsu.cs.course2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;;import java.io.IOException;
+import com.fasterxml.jackson.databind.SerializationFeature;;import java.io.*;
 
 public class Utils {
     private static ObjectMapper mapper;
@@ -10,12 +10,21 @@ public class Utils {
         mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    public static String toJson(Picture picture) {
+    public static void saveToFile(String filename, Picture picture) {
         try {
-            return mapper.writeValueAsString(picture);
+            OutputStream stream = new FileOutputStream(filename);
+            mapper.writeValue(stream, picture);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+    }
+
+    public static Picture loadFromFile(String filename) {
+        try {
+            InputStream stream = new FileInputStream(filename);
+            return mapper.readValue(stream, Picture.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
