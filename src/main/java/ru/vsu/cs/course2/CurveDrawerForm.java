@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CurveDrawerForm {
-    private JPanel drawPanel;
-    private JPanel rootPanel;
     private final ScreenConverter screenConverter;
     private final Canvas canvas;
+    private JPanel drawPanel;
+    private JPanel rootPanel;
     private JList<FigureConfiguration> figures;
     private JButton addButton;
     private JButton removeButton;
@@ -147,7 +147,7 @@ public class CurveDrawerForm {
         vStrokeSlider.setValue((int) (hsva[2] * vm));
         aStrokeSlider.setValue((int) (color.getAlpha() / 255f * am));
     }
-    
+
     private Color getFillColor() {
         int h = hFillSlider.getValue();
         int s = sFillSlider.getValue();

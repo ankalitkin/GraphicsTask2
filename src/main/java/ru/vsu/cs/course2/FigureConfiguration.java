@@ -15,6 +15,10 @@ public class FigureConfiguration {
     private Color fillColor = Color.white;
     private int configNumber = ++counter;
 
+    public static void setCounter(int counter) {
+        FigureConfiguration.counter = counter;
+    }
+
     public static FigureConfiguration getSampleFigureConfiguration() {
         FigureConfiguration fc = new FigureConfiguration();
         fc.setClosed(true);
@@ -34,6 +38,10 @@ public class FigureConfiguration {
 
     public boolean isVisible() {
         return isVisible;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
     }
 
     public boolean isClosed() {
@@ -90,10 +98,6 @@ public class FigureConfiguration {
 
     public void setFillColor(Color fillColor) {
         this.fillColor = fillColor;
-    }
-
-    public void setVisible(boolean visible) {
-        isVisible = visible;
     }
 
     @Override

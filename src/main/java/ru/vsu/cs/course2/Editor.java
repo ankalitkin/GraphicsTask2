@@ -11,15 +11,16 @@ import java.util.List;
 
 public class Editor implements MouseListener, MouseMotionListener, MouseWheelListener, Drawable {
     private static HashMap<RenderingHints.Key, Object> rh;
-    private final Font numbersFont = new Font("Segoe UI", Font.PLAIN, 16);
-    private final int dx = 4, dy = 4;
-    private Plane plane;
-    private Point selected;
 
     static {
         rh = new HashMap<>();
         rh.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
     }
+
+    private final Font numbersFont = new Font("Segoe UI", Font.PLAIN, 16);
+    private final int dx = 4, dy = 4;
+    private Plane plane;
+    private Point selected;
     private java.awt.Point oldPoint = null;
     private int buttonNumber = -1;
 

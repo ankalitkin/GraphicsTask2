@@ -7,7 +7,7 @@ import ru.vsu.cs.course2.ScreenPoint;
 import java.awt.*;
 import java.util.List;
 
-public class Stroke implements Drawable{
+public class Stroke implements Drawable {
     private Drawable drawable;
     private Color color;
     private double thickness;

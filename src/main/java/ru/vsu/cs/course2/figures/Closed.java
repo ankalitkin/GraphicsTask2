@@ -20,7 +20,7 @@ public class Closed implements Drawable {
         List<RealPoint> outlinePoints = drawable.getOutlinePoints();
         if (outlinePoints.size() == 0)
             return Collections.emptyList();
-        List<RealPoint> newList = new ArrayList<>(outlinePoints.size()+1);
+        List<RealPoint> newList = new ArrayList<>(outlinePoints.size() + 1);
         newList.addAll(outlinePoints);
         newList.add(outlinePoints.get(0));
         return newList;

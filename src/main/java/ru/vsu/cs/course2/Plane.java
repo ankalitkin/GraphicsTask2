@@ -6,16 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Plane {
-    class Point {
-        RealPoint vect;
-        int z;
-
-        Point(RealPoint vect, int z) {
-            this.vect = vect;
-            this.z = z;
-        }
-    }
-
     ArrayList<Point> points = new ArrayList<>();
     private int z;
 
@@ -65,6 +55,16 @@ public class Plane {
             list.add(point.vect);
         }
         return list;
+    }
+
+    class Point {
+        RealPoint vect;
+        int z;
+
+        Point(RealPoint vect, int z) {
+            this.vect = vect;
+            this.z = z;
+        }
     }
 
 }
