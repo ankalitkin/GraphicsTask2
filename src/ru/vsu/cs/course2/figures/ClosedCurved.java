@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class ClosedCurved implements Drawable {
+    private static final int SMOOTHNESS = 20;
     private Drawable drawable;
 
     public ClosedCurved(Drawable drawable) {
@@ -75,11 +76,11 @@ public class ClosedCurved implements Drawable {
         RealPoint[] keyPoints = points.toArray(new RealPoint[0]);
 
         TreeMap<Double, RealPoint> pointMap = new TreeMap<>();
-        for (double i = 0; i <= 1; i += 1.0 / (10 * points.size()))
+        for (double i = 0; i <= 1; i += 1.0 / (SMOOTHNESS * points.size()))
             pointMap.put(i, getValueAt(keyPoints, i));
 
         List<RealPoint> realPoints = new ArrayList<>(pointMap.values());
-        realPoints.add(realPoints.get(realPoints.size() - 1));
+        realPoints.add(realPoints.get(0));
         return realPoints;
     }
 
@@ -87,10 +88,5 @@ public class ClosedCurved implements Drawable {
     public void draw(ScreenConverter screenConverter, Graphics2D graphics2D) {
         //Nothing to draw now
         drawable.draw(screenConverter, graphics2D);
-    }
-
-    @Override
-    public Plane getPlane() {
-        return drawable.getPlane();
     }
 }

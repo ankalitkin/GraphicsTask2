@@ -5,6 +5,7 @@ import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Closed implements Drawable {
@@ -17,6 +18,8 @@ public class Closed implements Drawable {
     @Override
     public List<RealPoint> getOutlinePoints() {
         List<RealPoint> outlinePoints = drawable.getOutlinePoints();
+        if (outlinePoints.size() == 0)
+            return Collections.emptyList();
         List<RealPoint> newList = new ArrayList<>(outlinePoints.size()+1);
         newList.addAll(outlinePoints);
         newList.add(outlinePoints.get(0));
@@ -26,10 +29,5 @@ public class Closed implements Drawable {
     @Override
     public void draw(ScreenConverter screenConverter, Graphics2D graphics2D) {
         drawable.draw(screenConverter, graphics2D);
-    }
-
-    @Override
-    public Plane getPlane() {
-        return drawable.getPlane();
     }
 }

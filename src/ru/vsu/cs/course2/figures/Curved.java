@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Curved implements Drawable {
+    private static final int SMOOTHNESS = 20;
     private Drawable drawable;
 
     public Curved(Drawable drawable) {
@@ -77,7 +78,7 @@ public class Curved implements Drawable {
         RealPoint[] keyPoints = points.toArray(new RealPoint[0]);
 
         TreeMap<Double, RealPoint> pointMap = new TreeMap<>();
-        for (double i = 0; i <= 1; i += 1.0 / (10 * points.size()))
+        for (double i = 0; i <= 1; i += 1.0 / (SMOOTHNESS * points.size()))
             pointMap.put(i, getValueAt(keyPoints, i));
 
         return new ArrayList<>(pointMap.values());
@@ -89,8 +90,4 @@ public class Curved implements Drawable {
         drawable.draw(screenConverter, graphics2D);
     }
 
-    @Override
-    public Plane getPlane() {
-        return drawable.getPlane();
-    }
 }

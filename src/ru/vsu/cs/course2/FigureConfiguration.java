@@ -3,13 +3,38 @@ package ru.vsu.cs.course2;
 import java.awt.*;
 
 public class FigureConfiguration {
+    private static int counter = 0;
+    private Plane plane = new Plane();
+    private boolean isVisible = true;
     private boolean isClosed;
     private boolean isCurved;
-    private boolean isStroked;
-    private Color strokeColor;
-    private int strokeThickness;
+    private boolean isStroked = true;
+    private Color strokeColor = Color.black;
+    private int strokeThickness = 1;
     private boolean isFilled;
-    private Color fillColor;
+    private Color fillColor = Color.white;
+    private int configNumber = ++counter;
+
+    public static FigureConfiguration getSampleFigureConfiguration() {
+        FigureConfiguration fc = new FigureConfiguration();
+        fc.setClosed(true);
+        fc.setStrokeColor(Color.red);
+        fc.setFilled(true);
+        fc.setFillColor(Color.yellow);
+        return fc;
+    }
+
+    public Plane getPlane() {
+        return plane;
+    }
+
+    public void setPlane(Plane plane) {
+        this.plane = plane;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
 
     public boolean isClosed() {
         return isClosed;
@@ -65,5 +90,28 @@ public class FigureConfiguration {
 
     public void setFillColor(Color fillColor) {
         this.fillColor = fillColor;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("#");
+        sb.append(configNumber);
+        sb.append(" ");
+        if (isVisible)
+            sb.append("Vis");
+        if (isClosed)
+            sb.append("Cls");
+        if (isCurved)
+            sb.append("Cur");
+        if (isStroked)
+            sb.append("Str");
+        if (isFilled)
+            sb.append("Fil");
+        return sb.toString();
     }
 }

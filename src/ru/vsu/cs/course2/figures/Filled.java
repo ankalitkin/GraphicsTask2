@@ -39,9 +39,4 @@ public class Filled implements Drawable {
         }
         drawable.draw(screenConverter, graphics2D);
     }
-
-    @Override
-    public Plane getPlane() {
-        return drawable.getPlane();
-    }
 }

@@ -4,8 +4,9 @@ import ru.vsu.cs.course2.figures.*;
 
 public class FigureBuilder {
     public static Drawable createFigure(FigureConfiguration fc) {
-        Plane plane = new Plane();
-        Drawable drawable = new Figure(plane);
+        Drawable drawable = new Figure(fc.getPlane());
+        if (!fc.isVisible())
+            return drawable;
         if (fc.isCurved()) {
             if (fc.isClosed())
                 drawable = new ClosedCurved(drawable);

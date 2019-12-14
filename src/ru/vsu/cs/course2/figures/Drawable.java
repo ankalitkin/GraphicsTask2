@@ -10,6 +10,4 @@ public interface Drawable {
     List<RealPoint> getOutlinePoints();
 
     void draw(ScreenConverter screenConverter, Graphics2D graphics2D);
-
-    Plane getPlane();
 }

@@ -47,9 +47,4 @@ public class Stroke implements Drawable{
         graphics2D.setStroke(new BasicStroke((float) (screenConverter.getScale() * thickness)));
         graphics2D.drawPolyline(xPoints, yPoints, points.size());
     }
-
-    @Override
-    public Plane getPlane() {
-        return drawable.getPlane();
-    }
 }
