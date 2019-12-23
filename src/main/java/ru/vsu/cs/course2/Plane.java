@@ -7,6 +7,8 @@ import ru.vsu.cs.course2.figures.RealPoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 public class Plane {
@@ -67,5 +69,29 @@ public class Plane {
         for (RealPoint point : list) {
             points.add(new Point(point, z++));
         }
+    }
+
+    public Plane clone() {
+        Plane newPlane = new Plane();
+        List<Point> points = this.points.stream().map(Point::clone).collect(Collectors.toList());
+        newPlane.points = new ArrayList<>(points);
+        newPlane.z = z;
+        return newPlane;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Plane plane = (Plane) o;
+
+        return points != null ? points.equals(plane.points) : plane.points == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return points != null ? points.hashCode() : 0;
     }
 }

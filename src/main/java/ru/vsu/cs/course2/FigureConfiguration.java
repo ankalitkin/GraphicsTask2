@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Data
 public class FigureConfiguration {
@@ -18,10 +20,21 @@ public class FigureConfiguration {
     private int strokeThickness = 1;
     private boolean isFilled;
     private float[] fillRGBA = Color.white.getRGBComponents(null);
-    private int number = ++counter;
+    private int number;
 
     public static void setCounter(int counter) {
         FigureConfiguration.counter = counter;
+    }
+
+    public FigureConfiguration() {
+        this(true);
+    }
+
+    private FigureConfiguration(boolean q) {
+        if (q)
+            number = ++counter;
+        else
+            number = counter;
     }
 
     @JsonIgnore
@@ -58,4 +71,56 @@ public class FigureConfiguration {
         return name;
     }
 
+    public FigureConfiguration clone() {
+        FigureConfiguration fc = new FigureConfiguration(false);
+        fc.setPlane(plane.clone());
+        fc.setName(name);
+        fc.setVisible(isVisible);
+        fc.setClosed(isClosed);
+        fc.setCurved(isCurved);
+        fc.setStroked(isStroked);
+        fc.setStrokeRGBA(strokeRGBA);
+        fc.setStrokeThickness(strokeThickness);
+        fc.setFilled(isFilled);
+        fc.setFillRGBA(fillRGBA);
+        fc.setNumber(number);
+        return fc;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FigureConfiguration that = (FigureConfiguration) o;
+
+        if (isVisible != that.isVisible) return false;
+        if (isClosed != that.isClosed) return false;
+        if (isCurved != that.isCurved) return false;
+        if (isStroked != that.isStroked) return false;
+        if (strokeThickness != that.strokeThickness) return false;
+        if (isFilled != that.isFilled) return false;
+        if (number != that.number) return false;
+        if (!Objects.equals(plane, that.plane)) return false;
+        if (!Objects.equals(name, that.name)) return false;
+        if (!Arrays.equals(strokeRGBA, that.strokeRGBA)) return false;
+        return Arrays.equals(fillRGBA, that.fillRGBA);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = plane != null ? plane.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (isVisible ? 1 : 0);
+        result = 31 * result + (isClosed ? 1 : 0);
+        result = 31 * result + (isCurved ? 1 : 0);
+        result = 31 * result + (isStroked ? 1 : 0);
+        result = 31 * result + Arrays.hashCode(strokeRGBA);
+        result = 31 * result + strokeThickness;
+        result = 31 * result + (isFilled ? 1 : 0);
+        result = 31 * result + Arrays.hashCode(fillRGBA);
+        result = 31 * result + number;
+        return result;
+    }
 }

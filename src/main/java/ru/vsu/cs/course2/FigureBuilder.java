@@ -3,6 +3,10 @@ package ru.vsu.cs.course2;
 import ru.vsu.cs.course2.figures.*;
 
 public class FigureBuilder {
+    public static Drawable createFigure(FCContainer fc) {
+        return createFigure(fc.getFc());
+    }
+
     public static Drawable createFigure(FigureConfiguration fc) {
         Drawable drawable = new Figure(fc.getPlane());
         if (!fc.isVisible())

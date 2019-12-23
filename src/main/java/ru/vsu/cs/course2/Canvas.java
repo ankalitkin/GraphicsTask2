@@ -4,6 +4,7 @@ import ru.vsu.cs.course2.figures.Drawable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
@@ -17,6 +18,7 @@ public class Canvas extends JPanel {
     private ScreenConverter screenConverter;
     private Editor editor;
     private boolean reversed;
+    private Runnable operationCallback;
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -66,10 +68,44 @@ public class Canvas extends JPanel {
         return editor;
     }
 
+    public Runnable getOperationCallback() {
+        return operationCallback;
+    }
+
+    public void setOperationCallback(Runnable operationCallback) {
+        this.operationCallback = operationCallback;
+    }
+
     public void setEditor(Editor editor) {
         this.editor = editor;
         resetListeners();
         this.addMouseListener(editor);
+        this.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                operationCallback.run();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         this.addMouseMotionListener(editor);
         this.addMouseWheelListener(editor);
     }

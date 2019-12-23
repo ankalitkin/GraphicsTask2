@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -11,4 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 public class Picture {
     private List<FigureConfiguration> figures;
+    private int selected = 0;
+
+    public Picture copy() {
+        return new Picture(new ArrayList<>(figures), selected);
+    }
 }

@@ -3,12 +3,9 @@ package ru.vsu.cs.course2;
 import ru.vsu.cs.course2.figures.Drawable;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +16,7 @@ public class CurveDrawerForm {
     private final Canvas canvas;
     private JPanel drawPanel;
     private JPanel rootPanel;
-    private JList<FigureConfiguration> figures;
+    private JList<FCContainer> figures;
     private JButton addButton;
     private JButton removeButton;
     private JCheckBox closedCheckBox;
@@ -40,9 +37,20 @@ public class CurveDrawerForm {
     private JCheckBox visibleCheckBox;
     private JButton upButton;
     private JButton downButton;
-    private DefaultListModel<FigureConfiguration> figuresListModel = new DefaultListModel<>();
+    private JTextField nameTextField;
+    private JButton undoButton;
+    private JButton redoButton;
+    private DefaultListModel<FCContainer> figuresListModel = new DefaultListModel<>();
     private List<Drawable> figuresList = new LinkedList<>();
     private boolean updating;
+    private Stack<Runnable> undoStack = new Stack<>();
+    private Stack<Runnable> redoStack = new Stack<>();
+    private Timer stateSaveTimer;
+    private FigureConfiguration lastState;
+
+    {
+        System.out.println(" привет андрей ))))");
+    }
 
     private CurveDrawerForm() {
         canvas = new Canvas();
@@ -53,14 +61,16 @@ public class CurveDrawerForm {
         drawPanel.setLayout(new GridLayout());
         drawPanel.add(canvas);
         figures.setModel(figuresListModel);
-        figures.addListSelectionListener(e -> onSelectedFigureChange());
-        figuresListModel.add(0, FigureConfiguration.getSampleFigureConfiguration());
+        figures.addListSelectionListener(e -> {
+            onSelectedFigureChange();
+        });
+        figuresListModel.add(0, new FCContainer(FigureConfiguration.getSampleFigureConfiguration()));
         figures.setSelectedIndex(0);
 
         strokeThicknessSlider.setModel(new SpinnerNumberModel(1, 0, 10, 1));
 
         addButton.addActionListener(e -> {
-            figuresListModel.add(0, new FigureConfiguration());
+            figuresListModel.add(0, new FCContainer(new FigureConfiguration()));
             figures.setSelectedIndex(0);
             updateFigureConfiguration();
         });
@@ -77,7 +87,7 @@ public class CurveDrawerForm {
             int index = figures.getSelectedIndex();
             if (index < 1)
                 return;
-            FigureConfiguration fc = figuresListModel.get(index);
+            FCContainer fc = figuresListModel.get(index);
             figuresListModel.remove(index);
             figuresListModel.add(index - 1, fc);
             figures.setSelectedIndex(index - 1);
@@ -87,12 +97,13 @@ public class CurveDrawerForm {
             int index = figures.getSelectedIndex();
             if (index < 0 || index > figuresListModel.size() - 2)
                 return;
-            FigureConfiguration fc = figuresListModel.get(index);
+            FCContainer fc = figuresListModel.get(index);
             figuresListModel.remove(index);
             figuresListModel.add(index + 1, fc);
             figures.setSelectedIndex(index + 1);
         });
 
+        nameTextField.addActionListener(e -> updateFigureConfiguration());
         visibleCheckBox.addActionListener(e -> updateFigureConfiguration());
         closedCheckBox.addActionListener(e -> updateFigureConfiguration());
         curvedCheckBox.addActionListener(e -> updateFigureConfiguration());
@@ -123,25 +134,24 @@ public class CurveDrawerForm {
             if (picture == null)
                 return;
             setPicture(picture);
+            onSelectedFigureChange();
         });
+
+        undoButton.addActionListener(e -> undo());
+        redoButton.addActionListener(e -> redo());
+
+        canvas.setOperationCallback(this::saveState);
+
+        stateSaveTimer = new Timer(100, e -> saveState());
+        stateSaveTimer.setRepeats(false);
     }
 
     private Picture getPicture() {
         List<FigureConfiguration> list = new ArrayList<>();
         for (int i = 0; i < figuresListModel.size(); i++) {
-            list.add(figuresListModel.get(i));
+            list.add(figuresListModel.get(i).getFc());
         }
-        return new Picture(list);
-    }
-
-    private void setPicture(Picture picture) {
-        figuresListModel.clear();
-        if (picture == null)
-            return;
-        List<FigureConfiguration> list = picture.getFigures();
-        for (FigureConfiguration fc : list) {
-            figuresListModel.addElement(fc);
-        }
+        return new Picture(list, figures.getSelectedIndex());
     }
 
 
@@ -216,20 +226,41 @@ public class CurveDrawerForm {
         aFillSlider.setValue((int) (color.getAlpha() / 255f * am));
     }
 
+    private void setPicture(Picture picture) {
+        updating = true;
+        figuresListModel.clear();
+        if (picture == null)
+            return;
+        List<FigureConfiguration> list = picture.getFigures();
+        for (FigureConfiguration fc : list) {
+            figuresListModel.addElement(new FCContainer(fc));
+        }
+        figures.setSelectedIndex(picture.getSelected());
+        updating = false;
+    }
 
-    private FigureConfiguration getFigureConfiguration() {
+    private FCContainer getCurrentFc() {
         int index = figures.getSelectedIndex();
         if (index < 0)
             return null;
         return figuresListModel.get(index);
     }
 
+    private FigureConfiguration getFigureConfiguration() {
+        FCContainer fcContainer = getCurrentFc();
+        if (fcContainer == null)
+            return null;
+        return fcContainer.getFc();
+    }
+
     private void updateFigureConfiguration() {
         if (updating)
             return;
+        saveStateWithDelay();
         FigureConfiguration fc = getFigureConfiguration();
         if (fc == null)
             return;
+        fc.setName(nameTextField.getText());
         fc.setVisible(visibleCheckBox.isSelected());
         fc.setClosed(closedCheckBox.isSelected());
         fc.setCurved(curvedCheckBox.isSelected());
@@ -238,26 +269,23 @@ public class CurveDrawerForm {
         fc.setStrokeColor(getStrokeColor());
         fc.setStrokeThickness(getStrokeThickness());
         fc.setFillColor(getFillColor());
-        figuresList.set(figures.getSelectedIndex(), FigureBuilder.createFigure(fc));
-        drawPanel.repaint();
-        figures.repaint();
+        fcChanged();
     }
 
-    private void loadFC() {
-        updating = true;
+    private void saveStateWithDelay() {
+        if (stateSaveTimer.isRunning())
+            stateSaveTimer.stop();
+        stateSaveTimer.start();
+    }
+
+    private void fcChanged() {
         FigureConfiguration fc = getFigureConfiguration();
         if (fc == null)
             return;
+        figuresList.set(figures.getSelectedIndex(), FigureBuilder.createFigure(fc));
 
-        visibleCheckBox.setSelected(fc.isVisible());
-        closedCheckBox.setSelected(fc.isClosed());
-        curvedCheckBox.setSelected(fc.isCurved());
-        strokedCheckBox.setSelected(fc.isStroked());
-        filledCheckBox.setSelected(fc.isFilled());
-        strokeThicknessSlider.setValue(fc.getStrokeThickness());
-        setStrokeColor(fc.getStrokeColor());
-        setFillColor(fc.getFillColor());
-        updating = false;
+        canvas.repaint();
+        figures.repaint();
     }
 
     private int getStrokeThickness() {
@@ -307,5 +335,73 @@ public class CurveDrawerForm {
             return dir + file;
         }
         return null;
+    }
+
+    private void loadFC() {
+        updating = true;
+        FigureConfiguration fc = getFigureConfiguration();
+        if (fc == null)
+            return;
+
+        nameTextField.setText(fc.getName());
+        visibleCheckBox.setSelected(fc.isVisible());
+        closedCheckBox.setSelected(fc.isClosed());
+        curvedCheckBox.setSelected(fc.isCurved());
+        strokedCheckBox.setSelected(fc.isStroked());
+        filledCheckBox.setSelected(fc.isFilled());
+        strokeThicknessSlider.setValue(fc.getStrokeThickness());
+        setStrokeColor(fc.getStrokeColor());
+        setFillColor(fc.getFillColor());
+        updating = false;
+    }
+
+    private void saveState() {
+        if (!saveCurrentStateToUndo())
+            return;
+        redoStack.clear();
+    }
+
+    private boolean saveCurrentStateToUndo() {
+        FCContainer currentFc = getCurrentFc();
+        if (currentFc == null) {
+            return false;
+        }
+        FigureConfiguration current = currentFc.getFc();
+        if (current.equals(lastState)) {
+            return false;
+        }
+        FigureConfiguration revertTo = current.clone();
+        undoStack.add(() -> {
+            saveCurrentStateToRedo();
+            currentFc.setFc(revertTo);
+            onSelectedFigureChange();
+        });
+        lastState = revertTo;
+        return true;
+    }
+
+    private void saveCurrentStateToRedo() {
+        FCContainer currentFc = getCurrentFc();
+        if (currentFc == null) {
+            return;
+        }
+        FigureConfiguration revertTo = currentFc.getFc().clone();
+        redoStack.add(() -> {
+            saveCurrentStateToUndo();
+            currentFc.setFc(revertTo);
+            onSelectedFigureChange();
+        });
+    }
+
+    private void undo() {
+        if (undoStack.isEmpty())
+            return;
+        undoStack.pop().run();
+    }
+
+    private void redo() {
+        if (redoStack.isEmpty())
+            return;
+        redoStack.pop().run();
     }
 }
