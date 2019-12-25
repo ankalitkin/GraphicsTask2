@@ -38,21 +38,8 @@ class BresenhamEllipseUtils {
         if (Math.abs(ellipse.getDeltaAngle() - 2 * Math.PI) < TOO_SMALL)
             return true;
 
-        int xc = 0;
-        int yc = 0;
-        int x1 = ellipse.getACosMinAngle();
-        int y1 = ellipse.getBSinMinAngle();
-        int x2 = ellipse.getACosMaxAngle();
-        int y2 = ellipse.getBSinMaxAngle();
-        double xm = ellipse.getCosMinAngle() + ellipse.getCosMaxAngle();
-        double ym = ellipse.getSinMinAngle() + ellipse.getSinMaxAngle();
-        double dot = xm * x + ym * y;
-
-        if (Math.abs(dot) < TOO_SMALL)
-            return (x1 - x) * (y2 - y1) < (x2 - x1) * (y1 - y);
-
-        int a = (xc - x) * (y1 - yc) - (x1 - xc) * (yc - y);
-        int b = (x2 - x) * (yc - y2) - (xc - x2) * (y2 - y);
-        return (((a >= 0 && b >= 0) || (a <= 0 && b <= 0)) && (dot > 0)) == (ellipse.getDeltaAngle() < Math.PI);
+        double angle = (Math.atan2(y / (double) ellipse.getB(), x / (double) ellipse.getA()) + Math.PI * 2) % (Math.PI * 2);
+        return ellipse.getMinAngle() <= angle && angle <= ellipse.getMaxAngle()
+                || ellipse.getMinAngle() <= angle + Math.PI * 2 && angle + Math.PI * 2 <= ellipse.getMaxAngle();
     }
 }
