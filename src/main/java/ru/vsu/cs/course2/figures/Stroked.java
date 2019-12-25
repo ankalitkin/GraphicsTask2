@@ -1,18 +1,17 @@
 package ru.vsu.cs.course2.figures;
 
-import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 import ru.vsu.cs.course2.ScreenPoint;
 
 import java.awt.*;
 import java.util.List;
 
-public class Stroke implements Drawable {
+public class Stroked implements Drawable {
     private Drawable drawable;
     private Color color;
     private double thickness;
 
-    public Stroke(Drawable drawable, Color color, double thickness) {
+    public Stroked(Drawable drawable, Color color, double thickness) {
         this.drawable = drawable;
         this.color = color;
         this.thickness = thickness;
@@ -46,5 +45,6 @@ public class Stroke implements Drawable {
         }
         graphics2D.setStroke(new BasicStroke((float) (screenConverter.getScale() * thickness)));
         graphics2D.drawPolyline(xPoints, yPoints, points.size());
+        drawable.draw(screenConverter, graphics2D);
     }
 }

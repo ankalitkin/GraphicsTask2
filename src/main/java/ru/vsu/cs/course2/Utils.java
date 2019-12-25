@@ -1,7 +1,9 @@
 package ru.vsu.cs.course2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;;import java.io.*;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import java.io.*;
 
 public class Utils {
     private static ObjectMapper mapper;
