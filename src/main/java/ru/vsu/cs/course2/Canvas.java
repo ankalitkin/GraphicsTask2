@@ -8,9 +8,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Canvas extends JPanel {
@@ -22,22 +22,75 @@ public class Canvas extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+        BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = img.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(Color.white);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-        if (figures != null) {
-            List<Drawable> drawList = new ArrayList<>(figures);
-            if (reversed) {
-                Collections.reverse(drawList);
-            }
-            for (Drawable figure : drawList) {
-                figure.draw(screenConverter, g2d);
+        if (figures == null)
+            return;
+        List<Drawable> drawList = new ArrayList<>(figures);
+        if (reversed)
+            Collections.reverse(drawList);
+
+        int counter = 0;
+        List<Thread> threads = new ArrayList<>();
+        System.out.println("----- Начало отрисовки кадра -----");
+        for (Drawable figure : drawList) {
+            int cv = counter;
+            Thread myDrawingThread = new Thread(() -> {
+                Graphics2D grr = img.createGraphics();
+                grr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                Drawable lastCrossing = getLastCrossing(drawList, figure);
+                if (lastCrossing == null) {
+                    synchronized (figure.getSyncObject()) {
+                        System.out.printf("Фигура %d рисуется независимо%n", cv);
+                        figure.draw(screenConverter, grr);
+                    }
+                } else {
+                    System.out.printf("Фигура %d будет отрисована после фигуры %d%n",
+                            cv, drawList.indexOf(lastCrossing));
+                    synchronized (lastCrossing.getSyncObject()) {
+                        synchronized (figure.getSyncObject()) {
+                            figure.draw(screenConverter, grr);
+                            System.out.printf("Фигура %d отрисована%n", cv);
+                        }
+                    }
+                    //Косяк - объект блокируется только на время отрисовки, а не сразу.
+                    //Это нужно как-то исправить. Нужно блокировать его сразу при создании потока
+                }
+            });
+            counter++;
+            myDrawingThread.start();
+            threads.add(myDrawingThread);
+        }
+
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (InterruptedException ignored) {
             }
         }
+        System.out.printf("----- Конец отрисовки кадра -----%n%n");
+
         if (editor != null) {
             editor.draw(screenConverter, g2d);
         }
+        g.drawImage(img, 0, 0, null);
+    }
+
+    private Drawable getLastCrossing(List<Drawable> figures, Drawable current) {
+        Drawable lastCrossing = null;
+        for (Drawable other : figures) {
+            if (current == other)
+                break;
+            ScreenFigureBounds b1 = screenConverter.getBounds(current.getOutlinePoints());
+            ScreenFigureBounds b2 = screenConverter.getBounds(other.getOutlinePoints());
+            if (b1.crossesWith(b2)) {
+                lastCrossing = other;
+            }
+        }
+        return lastCrossing;
     }
 
     public boolean isReversed() {

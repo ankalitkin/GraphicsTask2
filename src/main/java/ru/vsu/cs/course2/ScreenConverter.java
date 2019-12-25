@@ -3,6 +3,7 @@ package ru.vsu.cs.course2;
 import ru.vsu.cs.course2.figures.RealPoint;
 
 import javax.swing.*;
+import java.util.List;
 
 public class ScreenConverter {
     private JPanel parent;
@@ -60,5 +61,24 @@ public class ScreenConverter {
 
     public ScreenPoint getCenter() {
         return new ScreenPoint(getScreenCenterX(), getScreenCenterY());
+    }
+
+    public ScreenFigureBounds getBounds(List<RealPoint> list) {
+        int minX = 0;
+        int maxX = 0;
+        int minY = 0;
+        int maxY = 0;
+        for (RealPoint rp : list) {
+            ScreenPoint sp = realToScreen(rp);
+            if (sp.getX() < minX)
+                minX = sp.getX();
+            if (sp.getX() > maxX)
+                maxX = sp.getX();
+            if (sp.getY() < minY)
+                minY = sp.getY();
+            if (sp.getY() > maxY)
+                maxY = sp.getY();
+        }
+        return new ScreenFigureBounds(minX, minY, maxX, maxY);
     }
 }

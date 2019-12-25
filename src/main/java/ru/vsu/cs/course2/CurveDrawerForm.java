@@ -2,11 +2,11 @@ package ru.vsu.cs.course2;
 
 import ru.vsu.cs.course2.figures.Drawable;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CurveDrawerForm {
@@ -47,10 +47,6 @@ public class CurveDrawerForm {
     private Stack<Runnable> redoStack = new Stack<>();
     private Timer stateSaveTimer;
     private FigureConfiguration lastState;
-
-    {
-        System.out.println(" привет андрей ))))");
-    }
 
     private CurveDrawerForm() {
         canvas = new Canvas();
