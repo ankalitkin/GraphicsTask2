@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 public class FigureConfiguration {
     private static int counter = 0;
     private Plane plane = new Plane();
-    private List<Modifier> modifiers;
+    private List<Modifier> modifiers = new ArrayList<>();
+    private int selected;
     private int number;
 
     public static FigureConfiguration getSampleFigureConfiguration() {
@@ -40,6 +41,6 @@ public class FigureConfiguration {
     public FigureConfiguration clone() {
         Plane newPlane = plane.clone();
         List<Modifier> newList = modifiers.stream().map(Modifier::clone).collect(Collectors.toList());
-        return new FigureConfiguration(newPlane, newList, number);
+        return new FigureConfiguration(newPlane, newList, selected, number);
     }
 }

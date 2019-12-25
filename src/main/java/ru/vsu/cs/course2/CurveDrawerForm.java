@@ -60,6 +60,9 @@ public class CurveDrawerForm {
         });
         propPanel.setLayout(new GridLayout());
         modifiers.addListSelectionListener(e -> {
+            FigureConfiguration fc = getFigureConfiguration();
+            if (fc != null)
+                fc.setSelected(modifiers.getSelectedIndex());
             propPanel.removeAll();
             Modifier modifier = getModifier();
             if (modifier == null)
@@ -68,12 +71,19 @@ public class CurveDrawerForm {
             propPanel.revalidate();
             propPanel.repaint();
         });
-        figuresListModel.add(0, new FCContainer(FigureConfiguration.getSampleFigureConfiguration()));
+
+        FigureConfiguration sfc = FigureConfiguration.getSampleFigureConfiguration();
+        for (Modifier modifier : sfc.getModifiers())
+            modifier.setOnChangedCallback(this::updateFigures);
+        figuresListModel.add(0, new FCContainer(sfc));
+
         figures.setSelectedIndex(0);
         modifiers.setModel(modifiersListModel);
 
         addModButton.addActionListener(e -> {
-            ModifierContainer element = new ModifierContainer(new OutlineModifier());
+            OutlineModifier modifier = new OutlineModifier();
+            modifier.setOnChangedCallback(this::updateFigures);
+            ModifierContainer element = new ModifierContainer(modifier);
             modifiersListModel.addElement(element);
             fcChanged();
         });
@@ -105,8 +115,6 @@ public class CurveDrawerForm {
             modifiersListModel.add(index + 1, mc);
             modifiers.setSelectedIndex(index + 1);
         });
-
-        //strokeThicknessSlider.setModel(new SpinnerNumberModel(1, 0, 10, 1));
 
         addButton.addActionListener(e -> {
             figuresListModel.add(0, new FCContainer(new FigureConfiguration()));
@@ -141,21 +149,6 @@ public class CurveDrawerForm {
             figures.setSelectedIndex(index + 1);
         });
 
-        /*nameTextField.addActionListener(e -> updateFigureConfiguration());
-        visibleCheckBox.addActionListener(e -> updateFigureConfiguration());
-        closedCheckBox.addActionListener(e -> updateFigureConfiguration());
-        curvedCheckBox.addActionListener(e -> updateFigureConfiguration());
-        strokedCheckBox.addActionListener(e -> updateFigureConfiguration());
-        filledCheckBox.addActionListener(e -> updateFigureConfiguration());
-        strokeThicknessSlider.addChangeListener(e -> updateFigureConfiguration());
-        hStrokeSlider.addChangeListener(e -> updateFigureConfiguration());
-        sStrokeSlider.addChangeListener(e -> updateFigureConfiguration());
-        vStrokeSlider.addChangeListener(e -> updateFigureConfiguration());
-        aStrokeSlider.addChangeListener(e -> updateFigureConfiguration());
-        hFillSlider.addChangeListener(e -> updateFigureConfiguration());
-        sFillSlider.addChangeListener(e -> updateFigureConfiguration());
-        vFillSlider.addChangeListener(e -> updateFigureConfiguration());
-        aFillSlider.addChangeListener(e -> updateFigureConfiguration());*/
         saveButton.addActionListener(e -> {
             Picture picture = getPicture();
             String filename = browseSaveFile();
@@ -182,6 +175,13 @@ public class CurveDrawerForm {
 
         stateSaveTimer = new Timer(100, e -> saveState());
         stateSaveTimer.setRepeats(false);
+    }
+
+    private void updateFigures() {
+        figuresList = getFiguresList();
+        canvas.setFigures(figuresList);
+        canvas.setEditor(createEditor());
+        canvas.repaint();
     }
 
     private Picture getPicture() {
@@ -215,59 +215,20 @@ public class CurveDrawerForm {
                 .map(ModifierContainer::getModifier).collect(Collectors.toList());
     }
 
-    /*private Color getStrokeColor() {
-        int h = hStrokeSlider.getValue();
-        int s = sStrokeSlider.getValue();
-        int v = vStrokeSlider.getValue();
-        int a = aStrokeSlider.getValue();
-        float hm = hStrokeSlider.getMaximum();
-        float sm = sStrokeSlider.getMaximum();
-        float vm = vStrokeSlider.getMaximum();
-        float am = aStrokeSlider.getMaximum();
-        float[] rgba = new float[4];
-        Color.getHSBColor(h / hm, s / sm, v / vm).getRGBComponents(rgba);
-        return new Color(rgba[0], rgba[1], rgba[2], a / am);
+    private void setModifiersList(FigureConfiguration fc) {
+        updating = true;
+        modifiersListModel.clear();
+        if (fc == null)
+            return;
+        List<Modifier> modifiers = fc.getModifiers();
+        if (modifiers == null)
+            return;
+        for (Modifier modifier : modifiers) {
+            modifiersListModel.addElement(new ModifierContainer(modifier));
+        }
+        this.modifiers.setSelectedIndex(fc.getSelected());
+        updating = false;
     }
-
-    private void setStrokeColor(Color color) {
-        float[] hsva = new float[4];
-        Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsva);
-        float hm = hStrokeSlider.getMaximum();
-        float sm = sStrokeSlider.getMaximum();
-        float vm = vStrokeSlider.getMaximum();
-        float am = aStrokeSlider.getMaximum();
-        hStrokeSlider.setValue((int) (hsva[0] * hm));
-        sStrokeSlider.setValue((int) (hsva[1] * sm));
-        vStrokeSlider.setValue((int) (hsva[2] * vm));
-        aStrokeSlider.setValue((int) (color.getAlpha() / 255f * am));
-    }
-
-    private Color getFillColor() {
-        int h = hFillSlider.getValue();
-        int s = sFillSlider.getValue();
-        int v = vFillSlider.getValue();
-        int a = aFillSlider.getValue();
-        float hm = hFillSlider.getMaximum();
-        float sm = sFillSlider.getMaximum();
-        float vm = vFillSlider.getMaximum();
-        float am = aFillSlider.getMaximum();
-        float[] rgba = new float[4];
-        Color.getHSBColor(h / hm, s / sm, v / vm).getRGBComponents(rgba);
-        return new Color(rgba[0], rgba[1], rgba[2], a / am);
-    }
-
-    private void setFillColor(Color color) {
-        float[] hsva = new float[4];
-        Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), hsva);
-        float hm = hFillSlider.getMaximum();
-        float sm = sFillSlider.getMaximum();
-        float vm = vFillSlider.getMaximum();
-        float am = aFillSlider.getMaximum();
-        hFillSlider.setValue((int) (hsva[0] * hm));
-        sFillSlider.setValue((int) (hsva[1] * sm));
-        vFillSlider.setValue((int) (hsva[2] * vm));
-        aFillSlider.setValue((int) (color.getAlpha() / 255f * am));
-    }*/
 
     private void setPicture(Picture picture) {
         updating = true;
@@ -335,11 +296,8 @@ public class CurveDrawerForm {
     }
 
     private void onSelectedFigureChange() {
-        //loadFC();
-        figuresList = getFiguresList();
-        canvas.setFigures(figuresList);
-        canvas.setEditor(createEditor());
-        canvas.repaint();
+        loadFC();
+        updateFigures();
         propPanel.revalidate();
         propPanel.repaint();
     }
@@ -374,23 +332,9 @@ public class CurveDrawerForm {
         return null;
     }
 
-    /*private void loadFC() {
-        updating = true;
-        FigureConfiguration fc = getFigureConfiguration();
-        if (fc == null)
-            return;
-
-        nameTextField.setText(fc.getName());
-        visibleCheckBox.setSelected(fc.isVisible());
-        closedCheckBox.setSelected(fc.isClosed());
-        curvedCheckBox.setSelected(fc.isCurved());
-        strokedCheckBox.setSelected(fc.isStroked());
-        filledCheckBox.setSelected(fc.isFilled());
-        strokeThicknessSlider.setValue(fc.getStrokeThickness());
-        setStrokeColor(fc.getStrokeColor());
-        setFillColor(fc.getFillColor());
-        updating = false;
-    }*/
+    private void loadFC() {
+        setModifiersList(getFigureConfiguration());
+    }
 
     private void saveState() {
         if (!saveCurrentStateToUndo())
