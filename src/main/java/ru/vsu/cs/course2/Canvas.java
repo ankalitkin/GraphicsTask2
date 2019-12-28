@@ -102,7 +102,7 @@ public class Canvas extends JPanel {
                 break;
             ScreenFigureBounds b1 = screenConverter.getBounds(current.getOutlinePoints());
             ScreenFigureBounds b2 = screenConverter.getBounds(other.getOutlinePoints());
-            if (b1.crossesWith(b2)) {
+            if (b2.contains(b1)) {
                 lastCrossing = other;
             }
         }

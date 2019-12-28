@@ -9,7 +9,7 @@ public class ScreenFigureBounds {
     private int minY;
     private int maxY;
 
-    private boolean check(ScreenFigureBounds other) {
+    public boolean contains(ScreenFigureBounds other) {
         int x1 = other.minX;
         int x2 = other.maxX;
         int y1 = other.minY;
@@ -19,7 +19,4 @@ public class ScreenFigureBounds {
         return xCross && yCross;
     }
 
-    public boolean crossesWith(ScreenFigureBounds other) {
-        return this.check(other) || other.check(this);
-    }
 }
