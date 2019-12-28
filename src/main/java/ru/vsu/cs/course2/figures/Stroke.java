@@ -1,13 +1,12 @@
 package ru.vsu.cs.course2.figures;
 
-import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 import ru.vsu.cs.course2.ScreenPoint;
 
 import java.awt.*;
 import java.util.List;
 
-public class Stroke implements Drawable {
+public class Stroke extends Drawable {
     private Drawable drawable;
     private Color color;
     private double thickness;

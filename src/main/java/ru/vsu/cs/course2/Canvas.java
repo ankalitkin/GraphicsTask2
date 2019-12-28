@@ -35,48 +35,64 @@ public class Canvas extends JPanel {
 
         int counter = 0;
         List<Thread> threads = new ArrayList<>();
-        System.out.println("----- Начало отрисовки кадра -----");
+        StringBuffer sb = new StringBuffer();
         for (Drawable figure : drawList) {
-            int cv = counter;
-            Thread myDrawingThread = new Thread(() -> {
-                Graphics2D grr = img.createGraphics();
-                grr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                Drawable lastCrossing = getLastCrossing(drawList, figure);
-                if (lastCrossing == null) {
-                    synchronized (figure.getSyncObject()) {
-                        System.out.printf("Фигура %d рисуется независимо%n", cv);
-                        figure.draw(screenConverter, grr);
-                    }
-                } else {
-                    System.out.printf("Фигура %d будет отрисована после фигуры %d%n",
-                            cv, drawList.indexOf(lastCrossing));
-                    synchronized (lastCrossing.getSyncObject()) {
-                        synchronized (figure.getSyncObject()) {
-                            figure.draw(screenConverter, grr);
-                            System.out.printf("Фигура %d отрисована%n", cv);
-                        }
-                    }
-                    //Косяк - объект блокируется только на время отрисовки, а не сразу.
-                    //Это нужно как-то исправить. Нужно блокировать его сразу при создании потока
-                }
-            });
-            counter++;
-            myDrawingThread.start();
-            threads.add(myDrawingThread);
+            int num = counter++;
+            Graphics2D grr = img.createGraphics();
+            grr.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Drawable lastCrossing = getLastCrossing(drawList, figure);
+            if (lastCrossing == null) {
+                threads.add(new Thread(() -> drawIndependently(grr, figure, num, sb)));
+            } else {
+                int otherNum = drawList.indexOf(lastCrossing);
+                sb.append(String.format("Фигура %s будет отрисована после фигуры %s%n", num, otherNum));
+                threads.add(new Thread(() -> drawAfter(grr, figure, lastCrossing, num, sb)));
+            }
+            figure.lock();
         }
-
-        for (Thread thread : threads) {
+        sb.append("----- Начало отрисовки кадра -----\n");
+        for (Thread task : threads) {
+            task.start();
+        }
+        for (Thread task : threads) {
             try {
-                thread.join();
-            } catch (InterruptedException ignored) {
+                task.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        System.out.printf("----- Конец отрисовки кадра -----%n%n");
+        sb.append("----- Конец отрисовки кадра -----\n");
 
         if (editor != null) {
             editor.draw(screenConverter, g2d);
         }
+        Graphics2D gr = img.createGraphics();
+        gr.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        gr.setColor(Color.blue);
+        //gr.setFont(new Font);
+        drawString(gr, sb.toString(), 0, 0);
+
         g.drawImage(img, 0, 0, null);
+    }
+
+    private void drawIndependently(Graphics2D graphics, Drawable drawable, int num, StringBuffer sb) {
+        sb.append(String.format("Фигура %d рисуется независимо%n", num));
+        drawable.draw(screenConverter, graphics);
+        drawable.unlock();
+    }
+
+    private void drawAfter(Graphics2D graphics, Drawable drawable, Drawable other, int num, StringBuffer sb) {
+        other.lock();
+        sb.append(String.format("Фигура %d отрисована %n", num));
+        drawable.draw(screenConverter, graphics);
+        other.unlock();
+        drawable.unlock();
+    }
+
+    void drawString(Graphics g, String text, int x, int y) {
+        int lineHeight = g.getFontMetrics().getHeight();
+        for (String line : text.split("\n"))
+            g.drawString(line, x, y += lineHeight);
     }
 
     private Drawable getLastCrossing(List<Drawable> figures, Drawable current) {

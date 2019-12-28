@@ -1,6 +1,5 @@
 package ru.vsu.cs.course2.figures;
 
-import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-public class Curved implements Drawable {
+public class Curved extends Drawable {
     private static final int SMOOTHNESS = 20;
     private Drawable drawable;
 

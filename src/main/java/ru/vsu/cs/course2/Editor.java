@@ -8,7 +8,7 @@ import java.awt.event.*;
 import java.util.HashMap;
 import java.util.List;
 
-public class Editor implements MouseListener, MouseMotionListener, MouseWheelListener, Drawable {
+public class Editor extends Drawable implements MouseListener, MouseMotionListener, MouseWheelListener {
     private static HashMap<RenderingHints.Key, Object> rh;
 
     static {

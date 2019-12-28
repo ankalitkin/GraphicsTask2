@@ -64,10 +64,10 @@ public class ScreenConverter {
     }
 
     public ScreenFigureBounds getBounds(List<RealPoint> list) {
-        int minX = 0;
-        int maxX = 0;
-        int minY = 0;
-        int maxY = 0;
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
         for (RealPoint rp : list) {
             ScreenPoint sp = realToScreen(rp);
             if (sp.getX() < minX)
@@ -79,6 +79,6 @@ public class ScreenConverter {
             if (sp.getY() > maxY)
                 maxY = sp.getY();
         }
-        return new ScreenFigureBounds(minX, minY, maxX, maxY);
+        return new ScreenFigureBounds(minX, maxX, minY, maxY);
     }
 }

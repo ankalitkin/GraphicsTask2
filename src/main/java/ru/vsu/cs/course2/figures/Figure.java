@@ -6,7 +6,7 @@ import ru.vsu.cs.course2.ScreenConverter;
 import java.awt.*;
 import java.util.List;
 
-public class Figure implements Drawable {
+public class Figure extends Drawable {
     private Plane plane;
 
     public Figure(Plane plane) {

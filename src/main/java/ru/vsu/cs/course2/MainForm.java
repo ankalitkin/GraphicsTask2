@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CurveDrawerForm {
+public class MainForm {
     private static final String CHOOSE_OPEN_FILE_MESSAGE = "Open file";
     private static final String CHOOSE_SAVE_FILE_MESSAGE = "Save file";
     private final ScreenConverter screenConverter;
@@ -48,7 +48,7 @@ public class CurveDrawerForm {
     private Timer stateSaveTimer;
     private FigureConfiguration lastState;
 
-    private CurveDrawerForm() {
+    private MainForm() {
         canvas = new Canvas();
         canvas.setReversed(true);
         screenConverter = new ScreenConverter(canvas);
@@ -156,8 +156,8 @@ public class CurveDrawerForm {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ignored) {
         }
-        JFrame frame = new JFrame("Curved drawer by @kalitkin_a_v");
-        frame.setContentPane(new CurveDrawerForm().rootPanel);
+        JFrame frame = new JFrame("Graphics editor by @kalitkin_a_v");
+        frame.setContentPane(new MainForm().rootPanel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1200, 900);
         frame.setVisible(true);

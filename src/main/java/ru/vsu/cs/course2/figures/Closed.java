@@ -1,6 +1,5 @@
 package ru.vsu.cs.course2.figures;
 
-import ru.vsu.cs.course2.Plane;
 import ru.vsu.cs.course2.ScreenConverter;
 
 import java.awt.*;
@@ -8,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Closed implements Drawable {
+public class Closed extends Drawable {
     private Drawable drawable;
 
     public Closed(Drawable drawable) {
